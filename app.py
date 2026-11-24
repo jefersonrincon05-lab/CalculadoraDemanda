@@ -900,7 +900,6 @@ Herramienta avanzada para dimensionamiento hidráulico, estimación de Demanda M
 caudales de pico (QMD, QMH) y auditoría técnica bajo el RAS (Resolución 0330 de 2017) y estándares internacionales.
 </p>
 <div class="brand-pills">
-<span class="marine-pill">🌊 Paleta: Aqua Natura</span>
 <span class="marine-pill">⚖️ Marco: {marco_label}</span>
 <span class="marine-pill">💧 Continuidad: 1 L/s = 86.40 m³/día</span>
 <span class="marine-pill">🔍 Auditoría Casilla por Casilla</span>
@@ -1242,7 +1241,7 @@ with tab_exportacion:
             st.markdown("""<div style="background:rgba(14, 38, 59, 0.92); backdrop-filter:blur(10px); border:2px solid #087E8B; border-radius:12px; padding:1.4rem; box-shadow:0 8px 24px rgba(0, 0, 0, 0.45);">
 <h4 style="font-family:'Manrope', sans-serif; font-size:19px; color:#38B6C5; margin-top:0;">📊 Libro Completo en Excel (.xlsx)</h4>
 <p style="font-family:'Inter', sans-serif; font-size:14px; color:#CBD5E1; line-height:1.5;">
-Incluye 5 hojas técnicas formalizadas con tipografía Calibri, fórmulas vivas en celda y paleta Aqua Natura:
+Incluye 5 hojas técnicas formalizadas con tipografía Calibri, fórmulas vivas en celda y diseño corporativo:
 </p>
 <ul style="font-family:'Inter', sans-serif; font-size:14px; color:#F1F5F9; padding-left:1.2rem; line-height:1.65;">
 <li><b style="color:#38B6C5;">01_Resumen:</b> Cuadro ejecutivo y gráfico de caudales.</li>
