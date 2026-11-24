@@ -85,9 +85,10 @@ AQUAMARIS_LOGO_SVG = (
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0');
     
     /* Tipografía Base Global */
-    html, body, [class*="css"] {
+    html, body {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         font-size: 15px;
         color: #F8FAFC !important;
@@ -176,7 +177,9 @@ st.markdown("""
         background: linear-gradient(180deg, #051321 0%, #071C2E 60%, #09263A 100%) !important;
         border-right: 1px solid rgba(56, 182, 197, 0.3) !important;
     }
-    [data-testid="stSidebar"] * {
+    [data-testid="stSidebar"] p,
+    [data-testid="stSidebar"] label,
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
         color: #F8FAFC !important;
         font-family: 'Inter', sans-serif !important;
     }
@@ -214,11 +217,39 @@ st.markdown("""
         color: #FFFFFF !important;
     }
 
-    p, span, li {
+    p, li, [data-testid="stMarkdownContainer"] p, [data-testid="stMarkdownContainer"] li {
         font-family: 'Inter', sans-serif !important;
         font-size: 15px !important;
         color: #F1F5F9 !important;
         line-height: 1.55 !important;
+    }
+
+    /* Preservar iconos nativos de Streamlit (Material Symbols / Material Icons) */
+    [class*="material-symbols"],
+    [class*="material-icons"],
+    [data-testid*="stIcon"],
+    [data-testid*="Icon"],
+    [data-testid="stExpanderToggleIcon"],
+    .material-symbols-rounded,
+    .material-symbols-outlined,
+    [data-testid="stExpander"] summary span:first-child,
+    [data-testid="stExpander"] summary i {
+        font-family: 'Material Symbols Rounded', 'Material Symbols Outlined', 'Material Icons' !important;
+        font-weight: normal !important;
+        font-style: normal !important;
+        font-size: 20px !important;
+        line-height: 1 !important;
+        letter-spacing: normal !important;
+        text-transform: none !important;
+        display: inline-block !important;
+        white-space: nowrap !important;
+        word-wrap: normal !important;
+        direction: ltr !important;
+        -webkit-font-smoothing: antialiased !important;
+        text-rendering: optimizeLegibility !important;
+        font-feature-settings: 'liga' !important;
+        fill: #38B6C5 !important;
+        color: #38B6C5 !important;
     }
 
     /* Etiquetas de Widgets con Máximo Contraste */
@@ -461,20 +492,33 @@ st.markdown("""
         transform: translateY(-2px);
     }
 
-    /* Acordeones / Desplegables */
+    /* Acordeones / Desplegables (st.expander) */
     [data-testid="stExpander"] {
         background: rgba(14, 38, 59, 0.88) !important;
         border: 1px solid rgba(56, 182, 197, 0.35) !important;
         border-radius: 10px !important;
+        overflow: hidden !important;
     }
-    [data-testid="stExpander"] details summary p {
+    [data-testid="stExpander"] summary {
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.6rem !important;
+        padding: 0.65rem 0.9rem !important;
+        cursor: pointer !important;
+        color: #38B6C5 !important;
+    }
+    [data-testid="stExpander"] summary p,
+    [data-testid="stExpander"] summary [data-testid="stMarkdownContainer"] p,
+    [data-testid="stExpander"] summary span {
         color: #38B6C5 !important;
         font-family: 'Manrope', sans-serif !important;
-        font-size: 16px !important;
+        font-size: 15px !important;
         font-weight: 700 !important;
+        margin: 0 !important;
     }
-    [data-testid="stExpander"] details summary svg {
+    [data-testid="stExpander"] summary svg {
         fill: #38B6C5 !important;
+        min-width: 18px !important;
     }
     [data-testid="stExpander"] [data-testid="stMarkdownContainer"] p,
     [data-testid="stExpander"] [data-testid="stMarkdownContainer"] li {
