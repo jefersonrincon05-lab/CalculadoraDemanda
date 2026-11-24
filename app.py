@@ -1,7 +1,7 @@
 """
 AQUAMARIS - Plataforma de Ingeniería Hídrica & Demanda de Agua
 Ambientación Marina Inmersiva - Paleta "Aqua Natura"
-Versión 4.5 - Partículas de Agua, Fondo Oceánico Profundo y Corrección de UI
+Versión 5.0 - Sistema Tipográfico Profesional (Manrope, Inter, JetBrains Mono) & Alto Contraste
 """
 
 import io
@@ -43,7 +43,7 @@ st.set_page_config(
 )
 
 # -----------------------------------------------------------------------------
-# CÓDIGO VECTORIAL DEL LOGO OFICIAL "AQUAMARIS" (SVG COMPACTO Y SIN ESPACIOS)
+# CÓDIGO VECTORIAL DEL LOGO OFICIAL "AQUAMARIS" (SVG COMPACTO)
 # -----------------------------------------------------------------------------
 AQUAMARIS_LOGO_SVG = (
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="100%" height="100%">'
@@ -79,28 +79,32 @@ AQUAMARIS_LOGO_SVG = (
 )
 
 # -----------------------------------------------------------------------------
-# ESTILOS CSS MARINOS INMERSIVOS (FONDO OCEÁNICO, BURBUJAS Y PARTICULAS)
-# Paleta Aqua Natura: #123047 | #087E8B | #38B6C5 | #25866C | #83B88C | #F4F9F8
+# SISTEMA TIPOGRÁFICO PROFESIONAL & ESTILOS MARINOS DE ALTO CONTRASTE
+# Fuentes: Manrope (Títulos) | Inter (General & UI) | JetBrains Mono (Numérico)
 # -----------------------------------------------------------------------------
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
     
+    /* Tipografía Base Global */
     html, body, [class*="css"] {
-        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 15px;
+        color: #F8FAFC !important;
+        -webkit-font-smoothing: antialiased;
     }
 
-    /* Fondo Inmersivo de Océano Profundo */
+    /* Fondo Oceánico Profundo Inmersivo */
     .stApp {
         background: linear-gradient(180deg, #071626 0%, #092032 25%, #0B2C42 55%, #093C52 85%, #08495A 100%) fixed !important;
-        color: #E2E8F0 !important;
+        color: #F8FAFC !important;
     }
 
     [data-testid="stHeader"] {
         background: transparent !important;
     }
 
-    /* Partículas de Agua y Burbujas Flotantes */
+    /* Partículas de Agua y Burbujas */
     .ocean-glimmer {
         position: fixed;
         top: 0;
@@ -132,31 +136,18 @@ st.markdown("""
     .ocean-bubble {
         position: absolute;
         bottom: -50px;
-        background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9), rgba(56, 182, 197, 0.45) 40%, rgba(8, 126, 139, 0.15) 75%, rgba(56, 182, 197, 0.65) 100%);
+        background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.95), rgba(56, 182, 197, 0.45) 40%, rgba(8, 126, 139, 0.15) 75%, rgba(56, 182, 197, 0.65) 100%);
         border-radius: 50%;
         box-shadow: 0 0 12px rgba(56, 182, 197, 0.55), inset 0 0 6px rgba(255, 255, 255, 0.85);
         pointer-events: none;
         animation: bubbleRise linear infinite;
     }
     @keyframes bubbleRise {
-        0% {
-            transform: translateY(0) translateX(0) scale(0.65);
-            opacity: 0;
-        }
-        12% {
-            opacity: 0.85;
-        }
-        50% {
-            transform: translateY(-50vh) translateX(30px) scale(1.0);
-            opacity: 0.85;
-        }
-        85% {
-            opacity: 0.7;
-        }
-        100% {
-            transform: translateY(-112vh) translateX(-25px) scale(1.2);
-            opacity: 0;
-        }
+        0% { transform: translateY(0) translateX(0) scale(0.65); opacity: 0; }
+        12% { opacity: 0.85; }
+        50% { transform: translateY(-50vh) translateX(30px) scale(1.0); opacity: 0.85; }
+        85% { opacity: 0.7; }
+        100% { transform: translateY(-112vh) translateX(-25px) scale(1.2); opacity: 0; }
     }
 
     .b1  { left: 3%;  width: 14px; height: 14px; animation-duration: 9s;   animation-delay: 0s; }
@@ -183,76 +174,193 @@ st.markdown("""
     /* Barra Lateral Marina */
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #051321 0%, #071C2E 60%, #09263A 100%) !important;
-        border-right: 1px solid rgba(56, 182, 197, 0.25) !important;
+        border-right: 1px solid rgba(56, 182, 197, 0.3) !important;
     }
     [data-testid="stSidebar"] * {
-        color: #E2E8F0;
+        color: #F8FAFC !important;
+        font-family: 'Inter', sans-serif !important;
     }
-
-    /* Tipografías y Controles de Formulario */
-    .stMarkdown, p, span, label, [data-testid="stWidgetLabel"] p {
-        color: #E2E8F0 !important;
-    }
-
-    div[data-baseweb="input"] {
-        background-color: rgba(9, 29, 46, 0.85) !important;
-        border: 1px solid rgba(56, 182, 197, 0.35) !important;
-        border-radius: 8px !important;
+    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
+        font-family: 'Manrope', sans-serif !important;
         color: #FFFFFF !important;
+        font-size: 20px !important;
+        font-weight: 700 !important;
+    }
+
+    /* JERARQUÍA TIPOGRÁFICA Y CONTROL DE CONTRASTE */
+    h1 {
+        font-family: 'Manrope', sans-serif !important;
+        font-size: 32px !important;
+        font-weight: 800 !important;
+        color: #FFFFFF !important;
+        letter-spacing: -0.02em !important;
+    }
+    h2 {
+        font-family: 'Manrope', sans-serif !important;
+        font-size: 22px !important;
+        font-weight: 700 !important;
+        color: #FFFFFF !important;
+    }
+    h3 {
+        font-family: 'Manrope', sans-serif !important;
+        font-size: 19px !important;
+        font-weight: 600 !important;
+        color: #38B6C5 !important;
+    }
+    h4 {
+        font-family: 'Manrope', sans-serif !important;
+        font-size: 18px !important;
+        font-weight: 700 !important;
+        color: #FFFFFF !important;
+    }
+
+    p, span, li {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 15px !important;
+        color: #F1F5F9 !important;
+        line-height: 1.55 !important;
+    }
+
+    /* Etiquetas de Widgets con Máximo Contraste */
+    [data-testid="stWidgetLabel"] label, [data-testid="stWidgetLabel"] p, label {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 15px !important;
+        font-weight: 600 !important;
+        color: #F8FAFC !important;
+        letter-spacing: 0.01em !important;
+    }
+
+    /* Textos Secundarios y Subtítulos Explicativos (Alto Contraste) */
+    .stCaption, [data-testid="stCaptionContainer"] p, [data-testid="stCaptionContainer"], small {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        color: #CBD5E1 !important;
+        line-height: 1.5 !important;
+    }
+
+    /* Entradas Numéricas y Formularios (JetBrains Mono para valores) */
+    div[data-baseweb="input"] {
+        background-color: rgba(9, 29, 46, 0.95) !important;
+        border: 1px solid rgba(56, 182, 197, 0.45) !important;
+        border-radius: 8px !important;
     }
     div[data-baseweb="input"]:focus-within {
         border-color: #38B6C5 !important;
-        box-shadow: 0 0 12px rgba(56, 182, 197, 0.45) !important;
+        box-shadow: 0 0 12px rgba(56, 182, 197, 0.5) !important;
     }
-    div[data-baseweb="select"] > div {
-        background-color: rgba(9, 29, 46, 0.85) !important;
-        border: 1px solid rgba(56, 182, 197, 0.35) !important;
+    div[data-baseweb="input"] input {
         color: #FFFFFF !important;
+        background-color: transparent !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 16px !important;
+        font-weight: 600 !important;
+    }
+    div[data-baseweb="input"] button {
+        color: #38B6C5 !important;
+        background-color: rgba(56, 182, 197, 0.15) !important;
+        border-color: rgba(56, 182, 197, 0.35) !important;
+    }
+    div[data-baseweb="input"] button:hover {
+        background-color: #087E8B !important;
+        color: #FFFFFF !important;
+    }
+    div[data-baseweb="input"] button svg {
+        fill: #38B6C5 !important;
+    }
+
+    /* Selectores y Listas Desplegables de Alto Contraste */
+    div[data-baseweb="select"] {
+        background-color: rgba(9, 29, 46, 0.95) !important;
+        border: 1px solid rgba(56, 182, 197, 0.45) !important;
         border-radius: 8px !important;
     }
-    input {
+    div[data-baseweb="select"] div {
+        color: #FFFFFF !important;
+        font-family: 'Inter', sans-serif !important;
+        font-size: 15px !important;
+        font-weight: 500 !important;
+    }
+    div[data-baseweb="select"] svg {
+        fill: #38B6C5 !important;
+    }
+    div[data-baseweb="popover"] {
+        background-color: #0A2236 !important;
+        border: 1px solid #38B6C5 !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8) !important;
+    }
+    div[data-baseweb="popover"] * {
+        background-color: #0A2236 !important;
+        color: #F8FAFC !important;
+        font-family: 'Inter', sans-serif !important;
+        font-size: 15px !important;
+    }
+    li[role="option"] {
+        background-color: #0A2236 !important;
+        color: #F8FAFC !important;
+    }
+    li[role="option"]:hover, li[aria-selected="true"] {
+        background-color: #087E8B !important;
         color: #FFFFFF !important;
     }
 
-    /* Pestañas Personalizadas Sin Color Rojo de Streamlit */
+    /* Radio Buttons y Checkboxes */
+    div[role="radiogroup"] label p, div[data-testid="stCheckbox"] label p {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 15px !important;
+        font-weight: 500 !important;
+        color: #F8FAFC !important;
+    }
+    div[role="radiogroup"] div[data-checked="true"] {
+        background-color: #38B6C5 !important;
+        border-color: #38B6C5 !important;
+    }
+
+    /* Pestañas de Módulos (Manrope + Inter) */
     .stTabs [data-baseweb="tab-list"] {
-        background: rgba(7, 22, 38, 0.75) !important;
-        border: 1px solid rgba(56, 182, 197, 0.3) !important;
+        background: rgba(7, 22, 38, 0.85) !important;
+        border: 1px solid rgba(56, 182, 197, 0.35) !important;
         border-radius: 10px !important;
         padding: 5px !important;
         gap: 6px !important;
     }
     .stTabs [data-baseweb="tab"] {
-        color: #94A3B8 !important;
+        color: #CBD5E1 !important;
+        font-family: 'Manrope', sans-serif !important;
         font-weight: 600 !important;
+        font-size: 15px !important;
         border-radius: 8px !important;
-        padding: 8px 18px !important;
+        padding: 9px 18px !important;
         border: none !important;
         background: transparent !important;
     }
     .stTabs [data-baseweb="tab"]:hover {
         color: #38B6C5 !important;
-        background: rgba(56, 182, 197, 0.1) !important;
+        background: rgba(56, 182, 197, 0.12) !important;
     }
     .stTabs [data-baseweb="tab"][aria-selected="true"] {
         color: #FFFFFF !important;
-        background: linear-gradient(135deg, rgba(8, 126, 139, 0.7) 0%, rgba(37, 134, 108, 0.7) 100%) !important;
-        border: 1px solid rgba(56, 182, 197, 0.55) !important;
-        box-shadow: 0 4px 14px rgba(8, 126, 139, 0.4) !important;
+        background: linear-gradient(135deg, rgba(8, 126, 139, 0.8) 0%, rgba(37, 134, 108, 0.8) 100%) !important;
+        border: 1px solid rgba(56, 182, 197, 0.6) !important;
+        box-shadow: 0 4px 14px rgba(8, 126, 139, 0.45) !important;
         font-weight: 700 !important;
     }
     .stTabs [data-baseweb="tab-highlight"] {
         display: none !important;
     }
 
-    /* Botones primarios en degradado marino */
+    /* Botones de Acción (Inter con peso equilibrado) */
     button[kind="primary"], .stButton > button {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 15px !important;
+        font-weight: 600 !important;
         background: linear-gradient(135deg, #087E8B 0%, #25866C 100%) !important;
         color: #FFFFFF !important;
         border: 1px solid #38B6C5 !important;
         box-shadow: 0 4px 15px rgba(8, 126, 139, 0.4) !important;
         border-radius: 8px !important;
-        font-weight: 700 !important;
+        padding: 0.55rem 1.2rem !important;
+        letter-spacing: 0.01em !important;
         transition: all 0.25s ease !important;
     }
     button[kind="primary"]:hover, .stButton > button:hover {
@@ -261,11 +369,15 @@ st.markdown("""
         transform: translateY(-2px);
     }
     .stDownloadButton > button {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 15px !important;
+        font-weight: 600 !important;
         background: linear-gradient(135deg, #087E8B 0%, #25866C 100%) !important;
         color: #FFFFFF !important;
         border: 1px solid #38B6C5 !important;
-        font-weight: 700 !important;
         border-radius: 8px !important;
+        padding: 0.55rem 1.2rem !important;
+        letter-spacing: 0.01em !important;
     }
     .stDownloadButton > button:hover {
         background: linear-gradient(135deg, #38B6C5 0%, #087E8B 100%) !important;
@@ -273,39 +385,44 @@ st.markdown("""
         transform: translateY(-2px);
     }
 
-    /* Expanders */
+    /* Acordeones / Desplegables */
     [data-testid="stExpander"] {
-        background: rgba(14, 38, 59, 0.75) !important;
-        border: 1px solid rgba(56, 182, 197, 0.28) !important;
+        background: rgba(14, 38, 59, 0.88) !important;
+        border: 1px solid rgba(56, 182, 197, 0.35) !important;
         border-radius: 10px !important;
     }
-    [data-testid="stExpander"] summary {
+    [data-testid="stExpander"] details summary p {
         color: #38B6C5 !important;
-        font-weight: 600 !important;
+        font-family: 'Manrope', sans-serif !important;
+        font-size: 16px !important;
+        font-weight: 700 !important;
+    }
+    [data-testid="stExpander"] details summary svg {
+        fill: #38B6C5 !important;
+    }
+    [data-testid="stExpander"] [data-testid="stMarkdownContainer"] p,
+    [data-testid="stExpander"] [data-testid="stMarkdownContainer"] li {
+        color: #E2E8F0 !important;
+        font-family: 'Inter', sans-serif !important;
+        font-size: 15px !important;
+        line-height: 1.6 !important;
+    }
+    [data-testid="stExpander"] [data-testid="stMarkdownContainer"] strong,
+    [data-testid="stExpander"] [data-testid="stMarkdownContainer"] b {
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
     }
 
-    /* Tablas y Editores */
+    /* Tablas y Data Editor */
     [data-testid="stDataFrame"], [data-testid="stDataEditor"] {
-        background: rgba(10, 28, 44, 0.85) !important;
-        border: 1px solid rgba(56, 182, 197, 0.3) !important;
+        background: rgba(10, 28, 44, 0.95) !important;
+        border: 1px solid rgba(56, 182, 197, 0.45) !important;
         border-radius: 10px !important;
+        color: #F8FAFC !important;
     }
-
-    /* Animaciones Marinas */
-    @keyframes floatDroplet {
-        0% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-7px) rotate(2deg); }
-        100% { transform: translateY(0px) rotate(0deg); }
-    }
-    @keyframes waveMove {
-        0% { transform: translateX(0); }
-        50% { transform: translateX(-25%); }
-        100% { transform: translateX(-50%); }
-    }
-    @keyframes waveBack {
-        0% { transform: translateX(-50%); }
-        50% { transform: translateX(-25%); }
-        100% { transform: translateX(0); }
+    [data-testid="stDataFrame"] *, [data-testid="stDataEditor"] * {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 14px !important;
     }
 
     /* Banner Oceánico Hero */
@@ -335,40 +452,45 @@ st.markdown("""
         filter: drop-shadow(0 8px 16px rgba(56, 182, 197, 0.4));
     }
     .brand-title {
-        font-size: 2.4rem;
+        font-family: 'Manrope', sans-serif;
+        font-size: 32px;
         font-weight: 800;
         letter-spacing: -0.02em;
         margin: 0;
         color: #FFFFFF;
         text-shadow: 0 0 20px rgba(56, 182, 197, 0.6);
+        line-height: 1.15;
     }
     .brand-tagline {
-        font-size: 1.05rem;
+        font-family: 'Manrope', sans-serif;
+        font-size: 19px;
         font-weight: 700;
         color: #38B6C5;
-        margin-top: 0.25rem;
-        letter-spacing: 0.04em;
+        margin-top: 0.35rem;
+        letter-spacing: 0.03em;
     }
     .brand-desc {
-        font-size: 0.92rem;
-        color: #E2E8F0;
-        margin-top: 0.4rem;
-        max-width: 900px;
-        line-height: 1.45;
+        font-family: 'Inter', sans-serif;
+        font-size: 15px;
+        color: #F1F5F9;
+        margin-top: 0.45rem;
+        max-width: 920px;
+        line-height: 1.55;
     }
     .brand-pills {
         display: flex;
         gap: 0.55rem;
         flex-wrap: wrap;
-        margin-top: 0.85rem;
+        margin-top: 0.9rem;
     }
     .marine-pill {
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
+        font-weight: 600;
         background: rgba(8, 126, 139, 0.35);
         backdrop-filter: blur(8px);
-        padding: 0.3rem 0.8rem;
+        padding: 0.3rem 0.85rem;
         border-radius: 9999px;
-        font-size: 0.8rem;
-        font-weight: 600;
         color: #E0F2FE;
         border: 1px solid rgba(56, 182, 197, 0.45);
     }
@@ -383,9 +505,10 @@ st.markdown("""
         z-index: 1;
     }
 
-    /* Títulos de Secciones */
+    /* Nombres de Módulos y Títulos de Sección (Manrope 20 a 22px) */
     .card-title {
-        font-size: 1.22rem;
+        font-family: 'Manrope', sans-serif;
+        font-size: 20px;
         font-weight: 700;
         color: #FFFFFF;
         margin-bottom: 0.9rem;
@@ -394,71 +517,115 @@ st.markdown("""
         gap: 0.6rem;
         border-bottom: 2px solid rgba(56, 182, 197, 0.35);
         padding-bottom: 0.45rem;
+        letter-spacing: -0.01em;
     }
 
-    /* KPI Grid y Cards de Datos */
+    /* KPI Grid y Resultados Principales (JetBrains Mono 28 a 32px) */
     .kpi-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
         gap: 1rem;
         margin-bottom: 1.3rem;
     }
     .kpi-card {
-        background: rgba(14, 38, 59, 0.85);
+        background: rgba(14, 38, 59, 0.92);
         backdrop-filter: blur(12px);
-        border: 1px solid rgba(56, 182, 197, 0.3);
+        border: 1px solid rgba(56, 182, 197, 0.35);
         border-radius: 12px;
-        padding: 1.15rem;
+        padding: 1.2rem;
         border-top: 4px solid #087E8B;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
         transition: transform 0.2s ease, box-shadow 0.2s ease, border-top-color 0.2s ease;
     }
     .kpi-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 12px 32px rgba(56, 182, 197, 0.28);
+        box-shadow: 0 12px 32px rgba(56, 182, 197, 0.3);
         border-top-color: #38B6C5;
     }
     .kpi-label {
-        font-size: 0.78rem;
-        font-weight: 700;
-        color: #94A3B8;
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        color: #CBD5E1;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.04em;
     }
     .kpi-val {
-        font-size: 1.75rem;
-        font-weight: 800;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 30px;
+        font-weight: 700;
         color: #FFFFFF;
         line-height: 1.2;
-        margin-top: 0.25rem;
+        margin-top: 0.3rem;
     }
     .kpi-unit {
-        font-size: 0.85rem;
-        font-weight: 500;
+        font-family: 'Inter', sans-serif;
+        font-size: 15px;
+        font-weight: 600;
         color: #38B6C5;
     }
     .kpi-sub {
-        font-size: 0.85rem;
-        color: #38B6C5;
-        margin-top: 0.25rem;
         font-family: 'JetBrains Mono', monospace;
+        font-size: 15px;
+        color: #38B6C5;
+        margin-top: 0.3rem;
         font-weight: 600;
     }
     .kpi-note {
-        font-size: 0.75rem;
-        color: #94A3B8;
-        margin-top: 0.3rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
+        color: #E2E8F0;
+        margin-top: 0.35rem;
     }
 
-    /* Badges de Estado */
+    /* Badges de Cumplimiento Técnico */
     .tag-conforme {
-        background: rgba(37, 134, 108, 0.3);
+        font-family: 'Inter', sans-serif;
+        background: rgba(37, 134, 108, 0.35);
         color: #83B88C;
-        padding: 0.3rem 0.65rem;
+        padding: 0.32rem 0.75rem;
         border-radius: 6px;
-        font-size: 0.8rem;
+        font-size: 13px;
         font-weight: 700;
         border: 1px solid #25866C;
+        letter-spacing: 0.03em;
+    }
+
+    /* Alertas con Alto Contraste */
+    div[data-testid="stAlert"] {
+        background-color: rgba(10, 32, 50, 0.95) !important;
+        border: 1px solid rgba(56, 182, 197, 0.45) !important;
+        color: #FFFFFF !important;
+    }
+    div[data-testid="stAlert"] * {
+        color: #FFFFFF !important;
+        font-family: 'Inter', sans-serif !important;
+        font-size: 15px !important;
+    }
+
+    /* Responsividad Celulares */
+    @media (max-width: 768px) {
+        .brand-title {
+            font-size: 24px !important;
+        }
+        .brand-tagline {
+            font-size: 16px !important;
+        }
+        .card-title {
+            font-size: 18px !important;
+        }
+        .kpi-val {
+            font-size: 24px !important;
+        }
+        .hero-content {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        .logo-box {
+            width: 60px;
+            height: 60px;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -471,8 +638,8 @@ with st.sidebar:
     st.markdown(
         f'<div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:1rem; padding-bottom:0.8rem; border-bottom:1px solid rgba(56, 182, 197, 0.3);">'
         f'<div style="width:48px; height:48px; flex-shrink:0;">{AQUAMARIS_LOGO_SVG}</div>'
-        f'<div><div style="font-size:1.3rem; font-weight:800; color:#FFFFFF; letter-spacing:-0.02em;">AQUAMARIS</div>'
-        f'<div style="font-size:0.75rem; color:#38B6C5; font-weight:700; letter-spacing:0.05em;">HIDRO-INGENIERÍA</div></div></div>',
+        f'<div><div style="font-family:\'Manrope\', sans-serif; font-size:22px; font-weight:800; color:#FFFFFF; letter-spacing:-0.02em;">AQUAMARIS</div>'
+        f'<div style="font-family:\'Inter\', sans-serif; font-size:12px; color:#38B6C5; font-weight:700; letter-spacing:0.06em;">HIDRO-INGENIERÍA</div></div></div>',
         unsafe_allow_html=True
     )
 
@@ -606,12 +773,12 @@ hero_html = f"""<div class="ocean-hero">
 <div class="hero-content">
 <div class="logo-box">{AQUAMARIS_LOGO_SVG}</div>
 <div>
-<div class="brand-title">AQUAMARIS</div>
+<h1 class="brand-title">AQUAMARIS</h1>
 <div class="brand-tagline">PLATAFORMA DE INGENIERÍA HÍDRICA &amp; DEMANDA DE AGUA</div>
-<div class="brand-desc">
+<p class="brand-desc">
 Herramienta avanzada para dimensionamiento hidráulico, estimación de Demanda Media Diaria (Qmd),
 caudales de pico (QMD, QMH) y auditoría técnica bajo el RAS (Resolución 0330 de 2017) y estándares internacionales.
-</div>
+</p>
 <div class="brand-pills">
 <span class="marine-pill">🌊 Paleta: Aqua Natura</span>
 <span class="marine-pill">⚖️ Marco: {marco_label}</span>
@@ -695,21 +862,21 @@ with tab_domestica:
 
     st.markdown("---")
     
-    st.markdown(f"""<div style="background:rgba(14, 38, 59, 0.85); backdrop-filter:blur(10px); border:1px solid rgba(56, 182, 197, 0.35); border-radius:12px; padding:1.1rem 1.5rem; display:flex; gap:2.5rem; flex-wrap:wrap; align-items:center; box-shadow:0 8px 24px rgba(0, 0, 0, 0.35);">
+    st.markdown(f"""<div style="background:rgba(14, 38, 59, 0.92); backdrop-filter:blur(10px); border:1px solid rgba(56, 182, 197, 0.35); border-radius:12px; padding:1.2rem 1.6rem; display:flex; gap:2.5rem; flex-wrap:wrap; align-items:center; box-shadow:0 8px 24px rgba(0, 0, 0, 0.4);">
 <div>
-<span style="font-size:0.75rem; color:#94A3B8; font-weight:700; text-transform:uppercase;">DOTACIÓN NETA:</span><br/>
-<span style="font-size:1.35rem; font-weight:800; color:#FFFFFF;">{dotacion_neta:.1f} <span style="font-size:0.85rem; color:#38B6C5; font-weight:600;">L/hab·d</span></span>
+<span style="font-family:'Inter', sans-serif; font-size:13px; color:#CBD5E1; font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">DOTACIÓN NETA:</span><br/>
+<span style="font-family:'JetBrains Mono', monospace; font-size:26px; font-weight:700; color:#FFFFFF;">{dotacion_neta:.1f} <span style="font-family:'Inter', sans-serif; font-size:14px; color:#38B6C5; font-weight:600;">L/hab·d</span></span>
 </div>
 <div>
-<span style="font-size:0.75rem; color:#94A3B8; font-weight:700; text-transform:uppercase;">PÉRDIDAS EN RED:</span><br/>
-<span style="font-size:1.35rem; font-weight:800; color:#38B6C5;">{perdidas_pct:.1f}%</span>
+<span style="font-family:'Inter', sans-serif; font-size:13px; color:#CBD5E1; font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">PÉRDIDAS EN RED:</span><br/>
+<span style="font-family:'JetBrains Mono', monospace; font-size:26px; font-weight:700; color:#38B6C5;">{perdidas_pct:.1f}%</span>
 </div>
 <div>
-<span style="font-size:0.75rem; color:#94A3B8; font-weight:700; text-transform:uppercase;">DOTACIÓN BRUTA CALCULADA:</span><br/>
-<span style="font-size:1.35rem; font-weight:800; color:#83B88C;">{dotacion_bruta_prelim:.2f} <span style="font-size:0.85rem; color:#83B88C; font-weight:600;">L/hab·d</span></span>
+<span style="font-family:'Inter', sans-serif; font-size:13px; color:#CBD5E1; font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">DOTACIÓN BRUTA CALCULADA:</span><br/>
+<span style="font-family:'JetBrains Mono', monospace; font-size:26px; font-weight:700; color:#83B88C;">{dotacion_bruta_prelim:.2f} <span style="font-family:'Inter', sans-serif; font-size:14px; color:#83B88C; font-weight:600;">L/hab·d</span></span>
 </div>
 <div>
-<span style="font-size:0.75rem; color:#94A3B8; font-weight:700; text-transform:uppercase;">ESTADO TÉCNICO:</span><br/>
+<span style="font-family:'Inter', sans-serif; font-size:13px; color:#CBD5E1; font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">ESTADO TÉCNICO:</span><br/>
 <span class="tag-conforme">CONFORME RAS 0330</span>
 </div>
 </div>""", unsafe_allow_html=True)
@@ -858,19 +1025,19 @@ with tab_resultados:
 <div class="kpi-sub">{results.industrial_volume_m3_day:,.1f} m³/día</div>
 <div class="kpi-note">{len(results.industrial_details)} proceso(s) modelados</div>
 </div>
-<div class="kpi-card" style="border-top-color: #38B6C5; background: rgba(18, 48, 71, 0.9);">
+<div class="kpi-card" style="border-top-color: #38B6C5; background: rgba(18, 48, 71, 0.95);">
 <div class="kpi-label" style="color: #38B6C5;">Demanda Media Total (Qmd)</div>
 <div class="kpi-val" style="color: #FFFFFF;">{results.total_flow_L_s:.2f} <span class="kpi-unit">L/s</span></div>
 <div class="kpi-sub" style="color: #80DEEA;">{results.total_volume_m3_day:,.1f} m³/día</div>
 <div class="kpi-note" style="color: #38B6C5; font-weight:700;">Base Concesiones y Balances</div>
 </div>
-<div class="kpi-card" style="border-top-color: #25866C; background: rgba(12, 42, 48, 0.9);">
+<div class="kpi-card" style="border-top-color: #25866C; background: rgba(12, 42, 48, 0.95);">
 <div class="kpi-label" style="color: #83B88C;">Máximo Diario (QMD)</div>
 <div class="kpi-val" style="color: #83B88C;">{results.q_max_daily_flow_L_s:.2f} <span class="kpi-unit">L/s</span></div>
 <div class="kpi-sub" style="color: #A7F3D0;">{results.q_max_daily_volume_m3_day:,.1f} m³/día</div>
 <div class="kpi-note" style="color: #83B88C;">k₁ = {results.k1_coefficient:.2f} | Captación, Aducción, PTAP</div>
 </div>
-<div class="kpi-card" style="border-top-color: #087E8B; background: rgba(10, 36, 54, 0.9);">
+<div class="kpi-card" style="border-top-color: #087E8B; background: rgba(10, 36, 54, 0.95);">
 <div class="kpi-label" style="color: #67E8F9;">Máximo Horario (QMH)</div>
 <div class="kpi-val" style="color: #67E8F9;">{results.q_max_hourly_flow_L_s:.2f} <span class="kpi-unit">L/s</span></div>
 <div class="kpi-sub" style="color: #BAE6FD;">{results.q_max_hourly_volume_m3_day:,.1f} m³/día</div>
@@ -888,17 +1055,17 @@ with tab_resultados:
                 marker_color=["#087E8B", "#38B6C5", "#80DEEA", "#25866C", "#83B88C"],
                 text=[f"{results.domestic_flow_L_s:.2f} L/s", f"{results.industrial_flow_L_s:.2f} L/s", f"{results.total_flow_L_s:.2f} L/s", f"{results.q_max_daily_flow_L_s:.2f} L/s", f"{results.q_max_hourly_flow_L_s:.2f} L/s"],
                 textposition="outside",
-                textfont=dict(color="#E2E8F0", size=11)
+                textfont=dict(color="#F8FAFC", size=12, family="JetBrains Mono")
             ))
             fig_bars.update_layout(
-                title=dict(text="Comparativa de Caudales del Sistema (L/s)", font=dict(size=14, color="#FFFFFF", family="Plus Jakarta Sans")),
-                height=320,
-                margin=dict(l=20, r=20, t=40, b=20),
-                yaxis=dict(title="Caudal (L/s)", gridcolor="rgba(56, 182, 197, 0.15)", color="#94A3B8", title_font=dict(color="#38B6C5")),
-                xaxis=dict(color="#E2E8F0", tickfont=dict(size=11), gridcolor="rgba(0,0,0,0)"),
-                plot_bgcolor="rgba(10, 30, 48, 0.6)",
+                title=dict(text="Comparativa de Caudales del Sistema (L/s)", font=dict(size=18, color="#FFFFFF", family="Manrope")),
+                height=330,
+                margin=dict(l=20, r=20, t=45, b=20),
+                yaxis=dict(title="Caudal (L/s)", gridcolor="rgba(56, 182, 197, 0.18)", tickfont=dict(color="#CBD5E1", size=12, family="Inter"), title_font=dict(color="#38B6C5", size=14, family="Inter")),
+                xaxis=dict(tickfont=dict(color="#F1F5F9", size=12, family="Inter"), gridcolor="rgba(0,0,0,0)"),
+                plot_bgcolor="rgba(10, 30, 48, 0.65)",
                 paper_bgcolor="rgba(0,0,0,0)",
-                font=dict(family="Plus Jakarta Sans, sans-serif")
+                font=dict(family="Inter, sans-serif")
             )
             st.plotly_chart(fig_bars, use_container_width=True)
 
@@ -912,16 +1079,16 @@ with tab_resultados:
                     textinfo="label+percent",
                     texttemplate="<b>%{label}</b><br>%{percent} (%{value:,.0f} m³/d)",
                     hoverinfo="label+value+percent",
-                    textfont=dict(color="#FFFFFF", size=12)
+                    textfont=dict(color="#FFFFFF", size=13, family="Inter")
                 )])
                 fig_donut.update_layout(
-                    title=dict(text="Distribución de la Demanda Diaria", font=dict(size=14, color="#FFFFFF", family="Plus Jakarta Sans")),
+                    title=dict(text="Distribución de la Demanda Diaria", font=dict(size=18, color="#FFFFFF", family="Manrope")),
                     showlegend=False,
-                    height=320,
-                    margin=dict(l=10, r=10, t=40, b=10),
+                    height=330,
+                    margin=dict(l=10, r=10, t=45, b=10),
                     paper_bgcolor="rgba(0,0,0,0)",
                     plot_bgcolor="rgba(0,0,0,0)",
-                    font=dict(family="Plus Jakarta Sans, sans-serif")
+                    font=dict(family="Inter, sans-serif")
                 )
                 st.plotly_chart(fig_donut, use_container_width=True)
 
@@ -942,7 +1109,7 @@ with tab_exportacion:
     st.markdown('<div class="card-title">📥 Generación de Memorias y Documentos Técnicos</div>', unsafe_allow_html=True)
     st.markdown("""
     Descarga la memoria completa de cálculo estructurada conforme a estándares de consultoría hidráulica y la identidad **AQUAMARIS**.
-    La memoria en Excel incluye 5 hojas técnicas con fórmulas comprobables en celdas, valores numéricos reales y auditoría de concordancia `Python vs Excel`.
+    La memoria en Excel incluye 5 hojas técnicas generadas con la tipografía corporativa **Calibri**, fórmulas comprobables en celdas, valores numéricos reales y auditoría de concordancia `Python vs Excel`.
     """)
 
     if results and not calc_error:
@@ -952,12 +1119,12 @@ with tab_exportacion:
         col_ex_main, col_ex_pdf = st.columns(2, gap="large")
 
         with col_ex_main:
-            st.markdown("""<div style="background:rgba(14, 38, 59, 0.85); backdrop-filter:blur(10px); border:2px solid #087E8B; border-radius:12px; padding:1.3rem; box-shadow:0 8px 24px rgba(0, 0, 0, 0.35);">
-<h4 style="color:#38B6C5; margin-top:0;">📊 Libro Completo en Excel (.xlsx)</h4>
-<p style="font-size:0.85rem; color:#CBD5E1;">
-Incluye 5 hojas técnicas formalizadas con fórmulas comprobables en celda y paleta Aqua Natura:
+            st.markdown("""<div style="background:rgba(14, 38, 59, 0.92); backdrop-filter:blur(10px); border:2px solid #087E8B; border-radius:12px; padding:1.4rem; box-shadow:0 8px 24px rgba(0, 0, 0, 0.45);">
+<h4 style="font-family:'Manrope', sans-serif; font-size:19px; color:#38B6C5; margin-top:0;">📊 Libro Completo en Excel (.xlsx)</h4>
+<p style="font-family:'Inter', sans-serif; font-size:14px; color:#CBD5E1; line-height:1.5;">
+Incluye 5 hojas técnicas formalizadas con tipografía Calibri, fórmulas vivas en celda y paleta Aqua Natura:
 </p>
-<ul style="font-size:0.82rem; color:#E2E8F0; padding-left:1.2rem; line-height:1.6;">
+<ul style="font-family:'Inter', sans-serif; font-size:14px; color:#F1F5F9; padding-left:1.2rem; line-height:1.65;">
 <li><b style="color:#38B6C5;">01_Resumen:</b> Cuadro ejecutivo y gráfico de caudales.</li>
 <li><b style="color:#38B6C5;">02_Datos_Entrada:</b> Parámetros del proyecto y marco normativo.</li>
 <li><b style="color:#38B6C5;">03_Memoria_Calculo:</b> Fórmulas auditables enlazadas a celdas.</li>
@@ -975,12 +1142,12 @@ Incluye 5 hojas técnicas formalizadas con fórmulas comprobables en celda y pal
             )
 
         with col_ex_pdf:
-            st.markdown("""<div style="background:rgba(14, 38, 59, 0.85); backdrop-filter:blur(10px); border:1px solid rgba(56, 182, 197, 0.35); border-radius:12px; padding:1.3rem; box-shadow:0 8px 24px rgba(0, 0, 0, 0.35);">
-<h4 style="color:#83B88C; margin-top:0;">📄 Informe Técnico en PDF (.pdf)</h4>
-<p style="font-size:0.85rem; color:#CBD5E1;">
+            st.markdown("""<div style="background:rgba(14, 38, 59, 0.92); backdrop-filter:blur(10px); border:1px solid rgba(56, 182, 197, 0.45); border-radius:12px; padding:1.4rem; box-shadow:0 8px 24px rgba(0, 0, 0, 0.45);">
+<h4 style="font-family:'Manrope', sans-serif; font-size:19px; color:#83B88C; margin-top:0;">📄 Informe Técnico en PDF (.pdf)</h4>
+<p style="font-family:'Inter', sans-serif; font-size:14px; color:#CBD5E1; line-height:1.5;">
 Documento formal maquetado con la identidad AQUAMARIS listo para adjuntar a expedientes técnicos:
 </p>
-<ul style="font-size:0.82rem; color:#E2E8F0; padding-left:1.2rem; line-height:1.6;">
+<ul style="font-family:'Inter', sans-serif; font-size:14px; color:#F1F5F9; padding-left:1.2rem; line-height:1.65;">
 <li>Tablas de caudales medios y máximos consolidados.</li>
 <li>Control de cumplimiento de Artículos 43 y 44 Res. 0330.</li>
 <li>Desglose de usuarios industriales y caudales en turno.</li>

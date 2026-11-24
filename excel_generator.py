@@ -37,10 +37,11 @@ def apply_cell_styles(
     wrap_text=False,
     border_style="thin",
     border_color=COLOR_BORDER,
-    number_format=None
+    number_format=None,
+    font_name="Calibri"
 ):
-    """Aplica estilos consistentes inspirados en la paleta Aqua Natura."""
-    cell.font = Font(name="Segoe UI", size=font_size, bold=font_bold, color=font_color)
+    """Aplica estilos consistentes usando Calibri por compatibilidad universal según estándar de consultoría."""
+    cell.font = Font(name=font_name, size=font_size, bold=font_bold, color=font_color)
     if bg_color:
         cell.fill = PatternFill(start_color=bg_color, end_color=bg_color, fill_type="solid")
     cell.alignment = Alignment(horizontal=alignment_h, vertical=alignment_v, wrap_text=wrap_text)
