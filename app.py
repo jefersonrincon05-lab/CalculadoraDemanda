@@ -240,14 +240,19 @@ st.markdown("""
     }
 
     /* Entradas Numéricas y Formularios (JetBrains Mono para valores) */
-    div[data-baseweb="input"] {
-        background-color: rgba(9, 29, 46, 0.95) !important;
-        border: 1px solid rgba(56, 182, 197, 0.45) !important;
+    [data-testid="stNumberInput"] > div > div,
+    div[data-baseweb="input"],
+    div[data-baseweb="input"] > div {
+        background-color: #0A2236 !important;
+        background: #0A2236 !important;
+        border: 1px solid rgba(56, 182, 197, 0.5) !important;
         border-radius: 8px !important;
     }
-    div[data-baseweb="input"]:focus-within {
+    div[data-baseweb="input"]:focus-within,
+    div[data-baseweb="input"] > div:focus-within {
         border-color: #38B6C5 !important;
         box-shadow: 0 0 12px rgba(56, 182, 197, 0.5) !important;
+        outline: none !important;
     }
     div[data-baseweb="input"] input {
         color: #FFFFFF !important;
@@ -269,39 +274,110 @@ st.markdown("""
         fill: #38B6C5 !important;
     }
 
-    /* Selectores y Listas Desplegables de Alto Contraste */
-    div[data-baseweb="select"] {
-        background-color: rgba(9, 29, 46, 0.95) !important;
-        border: 1px solid rgba(56, 182, 197, 0.45) !important;
+    /* CONTROLES SELECTBOX Y DESPLEGABLES - ALTO CONTRASTE TOTAL */
+    [data-testid="stSelectbox"] > div > div,
+    div[data-baseweb="select"],
+    div[data-baseweb="select"] > div,
+    div[data-baseweb="select"] div[role="combobox"],
+    div[data-baseweb="select"] > div:first-child {
+        background-color: #0A2236 !important;
+        background: #0A2236 !important;
+        border: 1px solid rgba(56, 182, 197, 0.5) !important;
         border-radius: 8px !important;
-    }
-    div[data-baseweb="select"] div {
         color: #FFFFFF !important;
+    }
+    div[data-baseweb="select"]:focus-within,
+    div[data-baseweb="select"] > div:focus-within,
+    [data-testid="stSelectbox"] > div > div:focus-within {
+        border-color: #38B6C5 !important;
+        box-shadow: 0 0 12px rgba(56, 182, 197, 0.5) !important;
+        outline: none !important;
+    }
+
+    /* Texto seleccionado en la casilla de selección */
+    div[data-baseweb="select"] span,
+    div[data-baseweb="select"] div,
+    div[data-baseweb="select"] p,
+    div[data-baseweb="select"] [data-testid="stMarkdownContainer"] p {
+        color: #FFFFFF !important;
+        font-family: 'Inter', sans-serif !important;
+        font-size: 15px !important;
+        font-weight: 600 !important;
+    }
+
+    /* Icono de flecha del selector */
+    div[data-baseweb="select"] svg {
+        fill: #38B6C5 !important;
+        color: #38B6C5 !important;
+    }
+
+    /* El menú desplegable flotante (BaseWeb Popover al abrir el selectbox) */
+    div[data-baseweb="popover"],
+    div[data-baseweb="popover"] > div,
+    div[data-baseweb="menu"],
+    div[data-baseweb="menu"] > ul,
+    ul[role="listbox"] {
+        background-color: #071A2C !important;
+        background: #071A2C !important;
+        border: 1px solid #38B6C5 !important;
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85) !important;
+        border-radius: 8px !important;
+        padding: 6px !important;
+    }
+
+    /* Opciones dentro del menú desplegable */
+    li[role="option"],
+    div[role="option"] {
+        background-color: #071A2C !important;
+        background: #071A2C !important;
+        color: #F8FAFC !important;
+        font-family: 'Inter', sans-serif !important;
+        font-size: 15px !important;
+        font-weight: 500 !important;
+        border-radius: 6px !important;
+        margin-bottom: 2px !important;
+        padding: 9px 14px !important;
+        transition: background-color 0.15s ease !important;
+    }
+
+    li[role="option"] *,
+    div[role="option"] * {
+        color: #F8FAFC !important;
         font-family: 'Inter', sans-serif !important;
         font-size: 15px !important;
         font-weight: 500 !important;
     }
-    div[data-baseweb="select"] svg {
+
+    /* Opción seleccionada o con cursor encima (Hover) */
+    li[role="option"]:hover,
+    li[role="option"][aria-selected="true"],
+    div[role="option"]:hover,
+    div[role="option"][aria-selected="true"] {
+        background-color: #087E8B !important;
+        background: #087E8B !important;
+        color: #FFFFFF !important;
+    }
+
+    li[role="option"]:hover *,
+    li[role="option"][aria-selected="true"] *,
+    div[role="option"]:hover *,
+    div[role="option"][aria-selected="true"] * {
+        color: #FFFFFF !important;
+        font-weight: 600 !important;
+    }
+
+    /* Icono de ayuda (?) con alto contraste */
+    [data-testid="stTooltipIcon"] svg,
+    [data-testid="stTooltipIcon"] {
         fill: #38B6C5 !important;
+        color: #38B6C5 !important;
     }
-    div[data-baseweb="popover"] {
-        background-color: #0A2236 !important;
+    div[data-testid="stTooltipContent"] {
+        background-color: #071A2C !important;
         border: 1px solid #38B6C5 !important;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8) !important;
-    }
-    div[data-baseweb="popover"] * {
-        background-color: #0A2236 !important;
         color: #F8FAFC !important;
         font-family: 'Inter', sans-serif !important;
-        font-size: 15px !important;
-    }
-    li[role="option"] {
-        background-color: #0A2236 !important;
-        color: #F8FAFC !important;
-    }
-    li[role="option"]:hover, li[aria-selected="true"] {
-        background-color: #087E8B !important;
-        color: #FFFFFF !important;
+        font-size: 14px !important;
     }
 
     /* Radio Buttons y Checkboxes */
