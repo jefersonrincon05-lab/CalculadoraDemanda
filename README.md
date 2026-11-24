@@ -30,6 +30,7 @@ Inspirada en los ecosistemas hídricos y oceánicos, **AQUAMARIS** incorpora una
 - [Características Principales](#-características-principales)
 - [Marco Normativo RAS 0330 / 2017 vs. Modo Exploratorio](#-marco-normativo-ras-0330--2017-vs-modo-exploratorio)
 - [Fundamentación Matemática y Ecuaciones Hidráulicas](#-fundamentación-matemática-y-ecuaciones-hidráulicas)
+- [Catálogo de 17 Benchmarks Industriales Formales](#-catálogo-de-17-benchmarks-industriales-formales)
 - [Diferenciación Rigurosa entre Demanda Media y Caudales Máximos](#-diferenciación-rigurosa-entre-demanda-media-y-caudales-máximos)
 - [Reconstrucción Profesional del Libro Excel (5 Hojas)](#-reconstrucción-profesional-del-libro-excel-5-hojas)
 - [Informe Técnico en PDF](#-informe-técnico-en-pdf)
@@ -43,16 +44,17 @@ Inspirada en los ecosistemas hídricos y oceánicos, **AQUAMARIS** incorpora una
 
 1. **Ambientación Marina y Marca Propia:**
    - Logotipo vectorial oficial SVG integrado, simulando un escudo oceánico con oleaje dinámico y gota cristalina.
-   - Animaciones fluidas en CSS (`@keyframes waveMove`, `@keyframes waveBack`, `@keyframes floatDroplet`) con estética marina inmersiva.
-2. **Organización en 4 Módulos Especializados:**
-   - 🏠 **Demanda Doméstica:** Selección por pisos térmicos / altitud o modo libre, cálculo de dotación bruta y pérdidas técnicas en red.
-   - 🏭 **Demanda Industrial:** Catálogo de industrias con consumos específicos respaldados en literatura técnica (UNESCO, CONAGUA, CEPIS), turnos operativos ($Q_{op}$) y editor unificado `st.data_editor`.
-   - 📊 **Resultados y Auditoría:** Gráfica comparativa de demandas, balance hídrico global y distribución de caudales para obras hidráulicas.
-   - 📥 **Exportación de Informes:** Generación de memoria técnica en Excel (`.xlsx`) y reporte ejecutivo en PDF (`.pdf`). Se eliminaron completamente formatos planos obsoletos (TXT y CSV).
+   - Animaciones fluidas en CSS (`@keyframes waveMove`, `@keyframes waveBack`, `@keyframes floatDroplet`) con estética marina inmersiva sobre la paleta **Aqua Natura**.
+2. **Organización en 5 Módulos Especializados:**
+   - 🏠 **1. Demanda Doméstica:** Selección por pisos térmicos / altitud o modo libre, cálculo de dotación bruta y pérdidas técnicas en red.
+   - 🏭 **2. Demanda Industrial:** Catálogo ampliado de 17 sectores industriales con consumos específicos respaldados en literatura técnica (Banco Mundial/IFC, PNUMA, FAO, CEPIS/OPS, IPPC BREF, Metcalf & Eddy, ACI), turnos operativos ($Q_{op}$), asistente de incorporación rápida, plantillas de sector y editor unificado `st.data_editor`.
+   - 📊 **3. Resultados y Auditoría:** Gráfica comparativa de demandas, balance hídrico global, cuadro de mando de caudales y matriz de auditoría casilla por casilla.
+   - 📐 **4. Memoria de Fórmulas y Teoría:** Exposición analítica completa de las ecuaciones de continuidad (factor 86.40), dotación bruta, caudales en turno $Q_{op}$, coeficientes $k_1$ y $k_2$, asignación a obras civiles y sustitución numérica en vivo con los datos del proyecto.
+   - 📥 **5. Exportación de Informes:** Generación de memoria técnica en Excel (`.xlsx`) de 5 hojas y reporte ejecutivo en PDF (`.pdf`). Se eliminaron completamente formatos planos obsoletos (TXT y CSV).
 3. **Cumplimiento Normativo RAS (Resolución 0330 de 2017):**
    - Validación automática de topes de dotación neta (Art. 43) y pérdidas técnicas máximas del 25% (Art. 44).
 4. **Excel con Fórmulas Vivas y Verificación:**
-   - 5 hojas estructuradas con fórmulas de celdas (`openpyxl`), gráficos de barras incrustados y módulo de verificación `Python vs Excel`.
+   - 5 hojas estructuradas con fórmulas de celdas (`openpyxl`), tipografía Calibri corporativa, gráficos incrustados y verificación `Python vs Excel`.
 
 ---
 
@@ -93,6 +95,32 @@ $$Q_{md, dom} = \frac{P \times D_{bruta}}{86\,400} = \frac{V_{dom}}{86.40} \quad
 
 ---
 
+## 🏭 Catálogo de 17 Benchmarks Industriales Formales
+
+El sistema cuenta con un catálogo predefinido con fuentes de literatura técnica internacional:
+
+| Sector Productivo | Consumo Específico Típico | Turno Típico | Fuente Documentada |
+| :--- | :---: | :---: | :--- |
+| **Bebidas y Refrescos** | $2.50\text{ L/L}$ bebida | $16\text{ h/d}$ | PNUMA / ONUDI - Guías de Producción Limpia; IPPC BREF. |
+| **Cervecería Industrial** | $4.50\text{ L/L}$ cerveza | $24\text{ h/d}$ | Metcalf & Eddy; European Commission IPPC BREF FDM (2019). |
+| **Planta Láctea / Pasteurizadora** | $2.00\text{ L/L}$ leche | $16\text{ h/d}$ | Banco Mundial / IFC - Guidelines for Dairy Processing. |
+| **Matadero Bovino** | $1\,200\text{ L/res}$ faenada | $8\text{ h/d}$ | FAO / CEPIS-OPS - Manual de Abastecimiento en Mataderos. |
+| **Matadero Porcino** | $450\text{ L/cerdo}$ faenado | $8\text{ h/d}$ | FAO / CEPIS-OPS; Guías de Saneamiento Agroindustrial. |
+| **Beneficio Avícola** | $25.0\text{ L/ave}$ faenada | $12\text{ h/d}$ | IFC / World Bank - Poultry Processing Guidelines. |
+| **Textil - Tintorería** | $110.0\text{ L/kg}$ tela | $16\text{ h/d}$ | European IPPC Bureau (BREF Textiles); CONAGUA. |
+| **Papel y Cartón** | $25.0\text{ m}^3\text{/ton}$ papel | $24\text{ h/d}$ | BAT Reference Document for Pulp, Paper and Board (2015). |
+| **Central de Concreto** | $0.20\text{ m}^3\text{/m}^3$ conc. | $10\text{ h/d}$ | American Concrete Institute (ACI 211.1). |
+| **Curtiduría de Pieles** | $35.0\text{ m}^3\text{/ton}$ piel | $12\text{ h/d}$ | UNIDO - Tanneries Environmental Benchmark. |
+| **Ingenio Azucarero** | $0.85\text{ m}^3\text{/ton}$ caña | $24\text{ h/d}$ | EPA / IFC - Sugar Manufacturing Guidelines. |
+| **Lavandería Industrial** | $20.0\text{ L/kg}$ ropa | $12\text{ h/d}$ | European Textile Services Association (ETSA); CONAGUA. |
+| **Farmacéutica** | $180.0\text{ L/empleado}\cdot\text{d}$ | $16\text{ h/d}$ | WHO Technical Report Series; IFC Guidelines. |
+| **Hotel / Resort** | $350.0\text{ L/huésped}\cdot\text{d}$ | $24\text{ h/d}$ | UNWTO / IHE Delft - Water Footprint in Tourism. |
+| **Hospital / Clínica** | $600.0\text{ L/cama}\cdot\text{d}$ | $24\text{ h/d}$ | WHO Essential Environmental Health Standards; RAS. |
+| **Lavadero de Vehículos** | $220.0\text{ L/vehículo}$ | $10\text{ h/d}$ | International Carwash Association (ICA). |
+| **Centro Educativo / Campus** | $45.0\text{ L/estudiante}\cdot\text{d}$ | $10\text{ h/d}$ | Metcalf & Eddy; RAS Título B. |
+
+---
+
 ## ⚡ Diferenciación Rigurosa entre Demanda Media y Caudales Máximos
 
 | Parámetro | Símbolo | Ecuación | Obras Civiles e Hidráulicas Asignadas |
@@ -121,11 +149,11 @@ Generado dinámicamente mediante `openpyxl` aplicando la paleta visual **Aqua Na
 HIDROLOGIA JEFERSON/
 ├── assets/
 │   └── logo.svg             # Logotipo vectorial oficial AQUAMARIS en SVG
-├── app.py                   # Interfaz interactiva Streamlit con ambientación marina
-├── hydrology_engine.py       # Motor de cálculo, validaciones físicas y normativa RAS
+├── app.py                   # Interfaz interactiva Streamlit (Aqua Natura + 5 Módulos)
+├── hydrology_engine.py       # Motor de cálculo, 17 benchmarks y normativa RAS
 ├── excel_generator.py        # Generador de memorias en Excel con fórmulas vivas
 ├── pdf_generator.py          # Generador de memorias de cálculo en PDF formal
-├── test_calculations.py     # Suite de 14 pruebas unitarias (pytest)
+├── test_calculations.py     # Suite de 16 pruebas unitarias (pytest)
 ├── requirements.txt         # Dependencias del entorno Python
 └── README.md                # Documentación técnica completa
 ```

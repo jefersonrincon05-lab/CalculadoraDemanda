@@ -118,6 +118,42 @@ DOCUMENTED_INDUSTRIAL_BENCHMARKS = {
         "horas_op_tipicas": 12.0,
         "fuente": "UNIDO - United Nations Industrial Development Organization, Tanneries Environmental Benchmark."
     },
+    "Ingenio Azucarero (m³ agua / ton caña)": {
+        "unit": "m3/unidad",
+        "consumo_tipico": 0.85,
+        "horas_op_tipicas": 24.0,
+        "fuente": "EPA / IFC - Environmental, Health, and Safety Guidelines for Sugar Manufacturing."
+    },
+    "Lavandería Industrial (L agua / kg ropa lavada)": {
+        "unit": "L/unidad",
+        "consumo_tipico": 20.0,
+        "horas_op_tipicas": 12.0,
+        "fuente": "European Textile Services Association (ETSA); CONAGUA - Manual de Eficiencia en Servicios."
+    },
+    "Industria Farmacéutica (L agua / empleado·día)": {
+        "unit": "L/unidad",
+        "consumo_tipico": 180.0,
+        "horas_op_tipicas": 16.0,
+        "fuente": "WHO Technical Report Series; IFC - Pharmaceuticals Manufacturing Guidelines."
+    },
+    "Complejo Hotelero / Resort (L agua / huésped·día)": {
+        "unit": "L/unidad",
+        "consumo_tipico": 400.0,
+        "horas_op_tipicas": 24.0,
+        "fuente": "OMT / CEPIS-OPS - Guías de Consumo y Saneamiento Turístico en América Latina."
+    },
+    "Hospital de Alta Complejidad (L agua / cama·día)": {
+        "unit": "L/unidad",
+        "consumo_tipico": 800.0,
+        "horas_op_tipicas": 24.0,
+        "fuente": "OPS/OMS - Guías de Calidad y Dotación de Agua en Establecimientos de Salud; RAS Título B."
+    },
+    "Estación de Lavado Automotriz (L agua / vehículo)": {
+        "unit": "L/unidad",
+        "consumo_tipico": 220.0,
+        "horas_op_tipicas": 10.0,
+        "fuente": "International Carwash Association (ICA) / Water Recycling Benchmarks."
+    },
 }
 
 

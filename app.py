@@ -924,13 +924,14 @@ st.markdown(hero_html, unsafe_allow_html=True)
 
 
 # -----------------------------------------------------------------------------
-# 4 SECCIONES PRINCIPALES (ORGANIZACIÓN EN PESTAÑAS)
+# 5 SECCIONES PRINCIPALES (ORGANIZACIÓN EN PESTAÑAS)
 # -----------------------------------------------------------------------------
-tab_domestica, tab_industrial, tab_resultados, tab_exportacion = st.tabs([
+tab_domestica, tab_industrial, tab_resultados, tab_formulas, tab_exportacion = st.tabs([
     "1. Demanda Doméstica",
     "2. Demanda Industrial",
     "3. Resultados y Auditoría",
-    "4. Exportación de Informes",
+    "4. Memoria de Fórmulas y Teoría",
+    "5. Exportación de Informes",
 ])
 
 
@@ -1014,14 +1015,143 @@ with tab_domestica:
 
 
 # =============================================================================
-# SECCIÓN 2: DEMANDA INDUSTRIAL (TABLA EDITABLE Y UNIFICADA)
+# SECCIÓN 2: DEMANDA INDUSTRIAL (INVENTARIO, ASISTENTE Y BENCHMARKS)
 # =============================================================================
 with tab_industrial:
     st.markdown('<div class="card-title">🏭 Inventario y Modelación de Demanda Industrial</div>', unsafe_allow_html=True)
-    st.caption("Edita directamente las celdas de la tabla para modificar consumos o agregar nuevas industrias. La tabla está 100% unificada con el motor de cálculo.")
+    st.markdown("""
+    Modela el consumo de agua del sector productivo. Puedes agregar industrias manualmente en la tabla, cargar paquetes típicos de sector
+    o utilizar el **Asistente por Giro Industrial** con consumos específicos tomados de literatura técnica formal (PNUMA, Banco Mundial, FAO, CEPIS/OPS, IPPC BREF, ACI).
+    """)
+
+    # -------------------------------------------------------------------------
+    # ASISTENTE DE INCORPORACIÓN RÁPIDA POR GIRO INDUSTRIAL
+    # -------------------------------------------------------------------------
+    with st.expander("➕ Asistente de Incorporación Rápida por Giro Industrial (Benchmarks Técnicos)", expanded=True):
+        st.markdown("<p style='font-size:14px; color:#CBD5E1; margin-bottom:0.6rem;'>Selecciona un sector productivo documentado para precargar su consumo específico y régimen de operación recomendado:</p>", unsafe_allow_html=True)
+        
+        catalog_keys = [k for k in DOCUMENTED_INDUSTRIAL_BENCHMARKS.keys() if k != "Personalizada"]
+        
+        col_bench1, col_bench2 = st.columns([1.5, 1], gap="medium")
+        with col_bench1:
+            selected_benchmark_key = st.selectbox(
+                "Giro Industrial / Sector Productivo Documentado:",
+                options=catalog_keys,
+                index=0,
+                key="select_benchmark_key"
+            )
+        bench_info = DOCUMENTED_INDUSTRIAL_BENCHMARKS[selected_benchmark_key]
+        
+        with col_bench2:
+            st.markdown(f"""<div style="background:rgba(8, 126, 139, 0.25); border:1px solid rgba(56, 182, 197, 0.45); border-radius:8px; padding:0.65rem 0.9rem; margin-top:0.25rem;">
+<div style="font-size:12px; color:#38B6C5; font-weight:700;">BENCHMARK DOCUMENTADO:</div>
+<div style="font-size:14px; color:#FFFFFF; font-weight:600;">{bench_info['consumo_tipico']} {bench_info['unit']} | {bench_info['horas_op_tipicas']:.0f} h/día</div>
+<div style="font-size:11px; color:#CBD5E1; margin-top:2px;">Fuente: {bench_info['fuente'][:85]}...</div>
+</div>""", unsafe_allow_html=True)
+
+        col_in1, col_in2, col_in3, col_in4 = st.columns([1.4, 1.1, 1, 1], gap="medium")
+        with col_in1:
+            default_name = selected_benchmark_key.split("(")[0].strip()
+            new_ind_name = st.text_input("Nombre de la Instalación / Razón Social:", value=f"{default_name} 01", key="input_new_ind_name")
+        with col_in2:
+            unit_name = bench_info["unit"]
+            default_units = 10000.0 if "L" in unit_name else 100.0
+            if "res" in selected_benchmark_key.lower():
+                default_units = 250.0
+            elif "ave" in selected_benchmark_key.lower():
+                default_units = 15000.0
+            elif "cerdo" in selected_benchmark_key.lower():
+                default_units = 400.0
+            elif "cama" in selected_benchmark_key.lower():
+                default_units = 200.0
+            elif "huésped" in selected_benchmark_key.lower():
+                default_units = 350.0
+            elif "vehículo" in selected_benchmark_key.lower():
+                default_units = 150.0
+            new_ind_units = st.number_input(f"Producción Diaria ({unit_name}):", min_value=1.0, value=default_units, step=50.0, format="%.0f", key="input_new_ind_units")
+        with col_in3:
+            new_ind_esp = st.number_input(f"Consumo Esp. ({unit_name}):", min_value=0.0001, value=float(bench_info["consumo_tipico"]), step=0.1, format="%.4f", key="input_new_ind_esp")
+        with col_in4:
+            new_ind_hours = st.number_input("Horas Turno (Hop):", min_value=1.0, max_value=24.0, value=float(bench_info["horas_op_tipicas"]), step=1.0, format="%.0f", key="input_new_ind_hours")
+
+        col_chk, col_add = st.columns([1.6, 1], gap="medium")
+        with col_chk:
+            new_ind_storage = st.checkbox("¿Dispone de tanque de reserva propio? (Recomendado: Amortigua picos residenciales)", value=True, key="input_new_ind_storage")
+        with col_add:
+            if st.button("➕ Incorporar Industria a la Tabla", key="btn_add_industry"):
+                new_row = {
+                    "Nombre": new_ind_name.strip() or "Nueva Industria",
+                    "Método": "Específico",
+                    "Unidades/día": float(new_ind_units),
+                    "Consumo esp.": float(new_ind_esp),
+                    "Unidad": bench_info["unit"],
+                    "Horas op.": float(new_ind_hours),
+                    "Reserva propia": bool(new_ind_storage),
+                    "Fuente": bench_info["fuente"]
+                }
+                curr_df = st.session_state["df_industries"].copy()
+                curr_df = curr_df[curr_df["Nombre"].notna() & (curr_df["Nombre"].astype(str).str.strip() != "") & (curr_df["Nombre"].astype(str).str.strip() != "None")]
+                st.session_state["df_industries"] = pd.concat([curr_df, pd.DataFrame([new_row])], ignore_index=True)
+                st.success(f"Industria '{new_ind_name}' agregada al inventario.")
+                st.rerun()
+
+    # -------------------------------------------------------------------------
+    # PLANTILLAS RÁPIDAS DE GIROS INDUSTRIALES TÍPICOS
+    # -------------------------------------------------------------------------
+    st.markdown("<div style='font-size:14px; font-weight:600; color:#CBD5E1; margin:1rem 0 0.4rem 0;'>Plantillas Rápidas por Sector Económico:</div>", unsafe_allow_html=True)
+    p_col1, p_col2, p_col3, p_col4, p_col5 = st.columns(5, gap="small")
+    with p_col1:
+        if st.button("🥛 Lácteo & Bebidas"):
+            st.session_state["df_industries"] = pd.DataFrame([
+                {"Nombre": "Planta Pasteurizadora", "Método": "Específico", "Unidades/día": 50000.0, "Consumo esp.": 2.0, "Unidad": "L/unidad", "Horas op.": 16.0, "Reserva propia": True, "Fuente": DOCUMENTED_INDUSTRIAL_BENCHMARKS["Planta Láctea / Pasteurizadora (L agua / L leche)"]["fuente"]},
+                {"Nombre": "Embotelladora de Refrescos", "Método": "Específico", "Unidades/día": 30000.0, "Consumo esp.": 2.5, "Unidad": "L/unidad", "Horas op.": 16.0, "Reserva propia": True, "Fuente": DOCUMENTED_INDUSTRIAL_BENCHMARKS["Bebidas y Refrescos (L agua / L bebida)"]["fuente"]},
+            ])
+            st.rerun()
+    with p_col2:
+        if st.button("🥩 Cárnico & Aves"):
+            st.session_state["df_industries"] = pd.DataFrame([
+                {"Nombre": "Frigorífico Bovino", "Método": "Específico", "Unidades/día": 300.0, "Consumo esp.": 1200.0, "Unidad": "L/unidad", "Horas op.": 8.0, "Reserva propia": True, "Fuente": DOCUMENTED_INDUSTRIAL_BENCHMARKS["Matadero / Frigorífico Bovino (L agua / res faenada)"]["fuente"]},
+                {"Nombre": "Beneficio Avícola", "Método": "Específico", "Unidades/día": 20000.0, "Consumo esp.": 25.0, "Unidad": "L/unidad", "Horas op.": 12.0, "Reserva propia": True, "Fuente": DOCUMENTED_INDUSTRIAL_BENCHMARKS["Planta de Beneficio Avícola (L agua / ave faenada)"]["fuente"]},
+            ])
+            st.rerun()
+    with p_col3:
+        if st.button("🧵 Textil & Lavandería"):
+            st.session_state["df_industries"] = pd.DataFrame([
+                {"Nombre": "Tintorería Textil", "Método": "Específico", "Unidades/día": 10000.0, "Consumo esp.": 110.0, "Unidad": "L/unidad", "Horas op.": 16.0, "Reserva propia": True, "Fuente": DOCUMENTED_INDUSTRIAL_BENCHMARKS["Industria Textil - Tintorería (L agua / kg tela procesada)"]["fuente"]},
+                {"Nombre": "Lavandería Industrial", "Método": "Específico", "Unidades/día": 3000.0, "Consumo esp.": 20.0, "Unidad": "L/unidad", "Horas op.": 12.0, "Reserva propia": True, "Fuente": DOCUMENTED_INDUSTRIAL_BENCHMARKS["Lavandería Industrial (L agua / kg ropa lavada)"]["fuente"]},
+            ])
+            st.rerun()
+    with p_col4:
+        if st.button("🏗️ Concreto & Papel"):
+            st.session_state["df_industries"] = pd.DataFrame([
+                {"Nombre": "Planta Concretera", "Método": "Específico", "Unidades/día": 350.0, "Consumo esp.": 0.20, "Unidad": "m3/unidad", "Horas op.": 10.0, "Reserva propia": True, "Fuente": DOCUMENTED_INDUSTRIAL_BENCHMARKS["Central de Concreto Hidráulico (m³ agua / m³ concreto)"]["fuente"]},
+                {"Nombre": "Molino Papelero", "Método": "Específico", "Unidades/día": 20.0, "Consumo esp.": 25.0, "Unidad": "m3/unidad", "Horas op.": 24.0, "Reserva propia": True, "Fuente": DOCUMENTED_INDUSTRIAL_BENCHMARKS["Fabricación de Papel y Cartón (m³ agua / ton papel)"]["fuente"]},
+            ])
+            st.rerun()
+    with p_col5:
+        if st.button("🔄 Restablecer"):
+            st.session_state["df_industries"] = pd.DataFrame(initial_ind_records)
+            st.rerun()
+
+    st.markdown("---")
+
+    # -------------------------------------------------------------------------
+    # TABLA EDITABLE (FILTRANDO AUTOMÁTICAMENTE FILAS VACÍAS O NONE)
+    # -------------------------------------------------------------------------
+    st.markdown("<div style='font-size:15px; font-weight:700; color:#FFFFFF; margin-bottom:0.4rem;'>📋 Matriz de Inventario Industrial Activo:</div>", unsafe_allow_html=True)
+    st.caption("Puedes editar libremente cualquier celda en la tabla. Las filas con datos incompletos o vacías se ignoran automáticamente.")
+
+    clean_table_df = st.session_state["df_industries"].copy()
+    clean_table_df = clean_table_df[
+        clean_table_df["Nombre"].notna() &
+        (clean_table_df["Nombre"].astype(str).str.strip() != "") &
+        (clean_table_df["Nombre"].astype(str).str.strip().str.lower() != "none")
+    ]
+    if clean_table_df.empty:
+        clean_table_df = pd.DataFrame(initial_ind_records)
 
     edited_df = st.data_editor(
-        st.session_state["df_industries"],
+        clean_table_df,
         num_rows="dynamic",
         use_container_width=True,
         column_config={
@@ -1039,20 +1169,16 @@ with tab_industrial:
 
     st.session_state["df_industries"] = edited_df
 
-    col_btn_i1, col_btn_i2 = st.columns([1, 4])
-    with col_btn_i1:
-        if st.button("Restablecer Industrias"):
-            st.session_state["df_industries"] = pd.DataFrame(initial_ind_records)
-            st.rerun()
-
-    with st.expander("Catálogo Documentado de Benchmarks Industriales de Referencia", expanded=False):
+    with st.expander("📖 Catálogo Técnico Completo de Benchmarks Industriales de Referencia (17 Giros)", expanded=False):
         b_data_list = []
         for k, v in DOCUMENTED_INDUSTRIAL_BENCHMARKS.items():
+            if k == "Personalizada":
+                continue
             b_data_list.append({
-                "Giro Industrial": k,
+                "Giro Industrial / Sector": k,
                 "Consumo Típico": f"{v['consumo_tipico']} {v['unit']}",
                 "Horas Op.": f"{v['horas_op_tipicas']:.0f} h/día",
-                "Fuente Técnica Documentada": v["fuente"]
+                "Fuente Técnica Formal": v["fuente"]
             })
         st.dataframe(pd.DataFrame(b_data_list), use_container_width=True, hide_index=True)
 
@@ -1219,6 +1345,203 @@ with tab_resultados:
         if results.audit_table:
             df_audit_display = pd.DataFrame(results.audit_table)
             st.dataframe(df_audit_display, use_container_width=True, hide_index=True)
+
+
+# =============================================================================
+# SECCIÓN 4: MEMORIA DE FÓRMULAS Y TEORÍA HIDRÁULICA
+# =============================================================================
+with tab_formulas:
+    st.markdown('<div class="card-title">📐 Memoria de Fórmulas y Fundamentos Hidráulicos</div>', unsafe_allow_html=True)
+    st.markdown("""
+    Esta sección expone formalmente el sustento matemático, dimensional y normativo implementado en el motor de cálculo de **AQUAMARIS**.
+    Todos los modelos se rigen por el principio de conservación de masa (continuidad hidráulica) y el marco normativo colombiano
+    establecido en el **Reglamento Técnico del Sector de Agua Potable y Saneamiento Básico (RAS - Resolución 0330 de 2017)** y el **Decreto 1077 de 2015**.
+    """)
+
+    col_theo1, col_theo2 = st.columns(2, gap="large")
+
+    with col_theo1:
+        st.markdown("""<div style="background:rgba(10, 30, 48, 0.75); border:1px solid rgba(56, 182, 197, 0.3); border-radius:10px; padding:1.2rem; margin-bottom:1.2rem;">
+<h4 style="font-family:'Manrope', sans-serif; color:#38B6C5; font-size:18px; margin-top:0;">1. Ecuación de Continuidad y Factor 86.40</h4>
+<p style="font-family:'Inter', sans-serif; font-size:14px; color:#E2E8F0; line-height:1.6;">
+La relación dimensional fundamental entre el volumen diario acumulado ($V$ en $\\text{m}^3/\\text{día}$) y el caudal continuo equivalente ($Q$ en $\\text{L/s}$) se deduce analíticamente:
+</p>
+</div>""", unsafe_allow_html=True)
+
+        st.latex(r"Q \, [\text{L/s}] = \frac{V \, [\text{m}^3/\text{día}] \times 1\,000 \, [\text{L/m}^3]}{86\,400 \, [\text{s/día}]} = \frac{V \, [\text{m}^3/\text{día}]}{86.40}")
+        st.latex(r"V \, [\text{m}^3/\text{día}] = Q \, [\text{L/s}] \times 86.40")
+
+        st.markdown("""<div style="background:rgba(10, 30, 48, 0.75); border:1px solid rgba(56, 182, 197, 0.3); border-radius:10px; padding:1.2rem; margin-bottom:1.2rem; margin-top:1.2rem;">
+<h4 style="font-family:'Manrope', sans-serif; color:#38B6C5; font-size:18px; margin-top:0;">2. Demanda Doméstica (Art. 43 y 44 Res. 0330/2017)</h4>
+<p style="font-family:'Inter', sans-serif; font-size:14px; color:#E2E8F0; line-height:1.6;">
+<b>a) Dotación Bruta ($D_{\\text{bruta}}$):</b> Incorpora las pérdidas técnicas admisibles en la red de distribución sobre la dotación neta de diseño:
+</p>
+</div>""", unsafe_allow_html=True)
+
+        st.latex(r"D_{\text{bruta}} = \frac{D_{\text{neta}}}{1 - \frac{\%P}{100}} \quad \left[\frac{\text{L}}{\text{hab}\cdot\text{día}}\right]")
+
+        st.markdown(r"""<p style="font-family:'Inter', sans-serif; font-size:13px; color:#94A3B8; margin-top:-0.5rem; margin-bottom:0.8rem;">
+<b>Límites RAS Art. 43:</b> Frío (&gt; 2000 msnm): máx. 120 L/hab·d | Templado (1000 - 2000 msnm): máx. 130 L/hab·d | Cálido (&lt; 1000 msnm): máx. 140 L/hab·d.<br>
+<b>Límite RAS Art. 44:</b> Pérdidas técnicas en red %P &le; 25.0%.
+</p>""", unsafe_allow_html=True)
+
+        st.markdown("<p style='font-family:Inter; font-size:14px; color:#E2E8F0;'><b>b) Caudal Medio Diario Doméstico ($Q_{md, \\text{dom}}$):</b></p>", unsafe_allow_html=True)
+        st.latex(r"Q_{md, \text{dom}} = \frac{P \times D_{\text{bruta}}}{86\,400} = \frac{P \times D_{\text{bruta}}}{86.40 \times 1\,000} \quad [\text{L/s}]")
+
+        st.markdown("<p style='font-family:Inter; font-size:14px; color:#E2E8F0;'><b>c) Volumen Medio Diario Doméstico ($V_{\\text{dom}}$):</b></p>", unsafe_allow_html=True)
+        st.latex(r"V_{\text{dom}} = \frac{P \times D_{\text{bruta}}}{1\,000} = Q_{md, \text{dom}} \times 86.40 \quad [\text{m}^3/\text{día}]")
+
+        st.markdown("""<div style="background:rgba(10, 30, 48, 0.75); border:1px solid rgba(56, 182, 197, 0.3); border-radius:10px; padding:1.2rem; margin-bottom:1.2rem; margin-top:1.2rem;">
+<h4 style="font-family:'Manrope', sans-serif; color:#38B6C5; font-size:18px; margin-top:0;">3. Demanda Industrial y Caudal en Turno Operativo</h4>
+<p style="font-family:'Inter', sans-serif; font-size:14px; color:#E2E8F0; line-height:1.6;">
+<b>a) Volumen Diario por Industria ($V_i$):</b> Calculado por estimación directa o por producto de unidades producidas y consumo específico documentado:
+</p>
+</div>""", unsafe_allow_html=True)
+
+        st.latex(r"V_i = \text{Unidades/día} \times C_{\text{esp}} \quad [\text{m}^3/\text{día}] \quad \implies \quad V_{\text{ind}} = \sum_{i=1}^{n} V_i")
+        st.latex(r"Q_{md, \text{ind}} = \frac{V_{\text{ind}}}{86.40} \quad [\text{L/s}]")
+
+        st.markdown("<p style='font-family:Inter; font-size:14px; color:#E2E8F0;'><b>b) Caudal Operativo Instantáneo en Horas de Turno ($Q_{op, i}$):</b></p>", unsafe_allow_html=True)
+        st.latex(r"Q_{op, i} = \frac{V_i \times 1\,000}{H_{op, i} \times 3\,600} = \frac{V_i}{3.6 \times H_{op, i}} \quad [\text{L/s}]")
+        st.caption("Nota técnica: Si la industria no dispone de tanque de almacenamiento propio, la red de distribución municipal debe suministrar el caudal operativo instantáneo Qop durante las horas del turno.")
+
+    with col_theo2:
+        st.markdown("""<div style="background:rgba(10, 30, 48, 0.75); border:1px solid rgba(56, 182, 197, 0.3); border-radius:10px; padding:1.2rem; margin-bottom:1.2rem;">
+<h4 style="font-family:'Manrope', sans-serif; color:#38B6C5; font-size:18px; margin-top:0;">4. Integración del Sistema y Coeficientes de Pico ($k_1, k_2$)</h4>
+<p style="font-family:'Inter', sans-serif; font-size:14px; color:#E2E8F0; line-height:1.6;">
+<b>a) Caudal Medio Diario Total del Sistema ($Q_{md}$):</b>
+</p>
+</div>""", unsafe_allow_html=True)
+
+        st.latex(r"Q_{md} = Q_{md, \text{dom}} + Q_{md, \text{ind}} \quad [\text{L/s}]")
+        st.latex(r"V_{\text{total}} = V_{\text{dom}} + V_{\text{ind}} \quad [\text{m}^3/\text{día}]")
+
+        st.markdown(r"""<p style="font-family:'Inter', sans-serif; font-size:14px; color:#E2E8F0; margin-top:0.6rem;">
+<b>b) Caudal Máximo Diario ($Q_{MD}$):</b> Coeficiente $k_1$ según Art. 47 Res. 0330 ($1.10 \le k_1 \le 1.30$). Si las industrias disponen de reserva propia (estándar hidráulico), su demanda no se mayora por los picos residenciales:
+</p>""", unsafe_allow_html=True)
+
+        st.latex(r"Q_{MD} = \begin{cases} (Q_{md, \text{dom}} \times k_1) + Q_{md, \text{ind}} & \text{si industria amortigua con reserva} \\ Q_{md} \times k_1 & \text{sin amortiguamiento industrial} \end{cases}")
+
+        st.markdown(r"""<p style="font-family:'Inter', sans-serif; font-size:14px; color:#E2E8F0; margin-top:0.6rem;">
+<b>c) Caudal Máximo Horario ($Q_{MH}$):</b> Coeficiente $k_2$ según Art. 47 Res. 0330 ($1.40 \le k_2 \le 1.60$ para poblaciones mayores a 12.500 hab, o hasta 1.80 para menores):
+</p>""", unsafe_allow_html=True)
+
+        st.latex(r"Q_{MH} = \begin{cases} (Q_{md, \text{dom}} \times k_1 \times k_2) + Q_{md, \text{ind}} & \text{si industria amortigua con reserva} \\ Q_{MD} \times k_2 = Q_{md} \times k_1 \times k_2 & \text{sin amortiguamiento industrial} \end{cases}")
+
+        st.markdown("""<div style="background:rgba(10, 30, 48, 0.75); border:1px solid rgba(56, 182, 197, 0.3); border-radius:10px; padding:1.2rem; margin-bottom:1.2rem; margin-top:1.2rem;">
+<h4 style="font-family:'Manrope', sans-serif; color:#38B6C5; font-size:18px; margin-top:0;">5. Asignación Normativa a Obras Civiles (Art. 48)</h4>
+<p style="font-family:'Inter', sans-serif; font-size:13px; color:#CBD5E1; line-height:1.5;">
+La Resolución 0330 de 2017 (RAS) establece el caudal de diseño obligatorio para cada componente de la infraestructura:
+</p>
+<table style="width:100%; font-family:'Inter', sans-serif; font-size:12px; color:#F1F5F9; border-collapse:collapse; margin-top:8px;">
+<thead>
+<tr style="border-bottom:1px solid #38B6C5; color:#38B6C5; text-align:left;">
+<th style="padding:4px 6px;">Componente</th>
+<th style="padding:4px 6px;">Caudal de Diseño</th>
+<th style="padding:4px 6px;">Base Técnica</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+<td style="padding:5px 6px;"><b>Captación de Agua</b></td>
+<td style="padding:5px 6px; font-family:'JetBrains Mono'; color:#83B88C;">QMD (+ pérdidas)</td>
+<td style="padding:5px 6px;">Asegura suministro en el día de mayor demanda anual.</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+<td style="padding:5px 6px;"><b>Desarenador y Aducción</b></td>
+<td style="padding:5px 6px; font-family:'JetBrains Mono'; color:#83B88C;">QMD</td>
+<td style="padding:5px 6px;">Transporte continuo de agua cruda hacia la planta.</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+<td style="padding:5px 6px;"><b>Planta Potabilizadora (PTAP)</b></td>
+<td style="padding:5px 6px; font-family:'JetBrains Mono'; color:#83B88C;">QMD</td>
+<td style="padding:5px 6px;">Capacidad nominal de floculación, sedimentación y filtros.</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+<td style="padding:5px 6px;"><b>Tanque de Compensación</b></td>
+<td style="padding:5px 6px; font-family:'JetBrains Mono'; color:#38B6C5;">Vol. Regulación</td>
+<td style="padding:5px 6px;">Amortigua la diferencia entre oferta continua (QMD) y demanda horaria (QMH).</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+<td style="padding:5px 6px;"><b>Red de Distribución</b></td>
+<td style="padding:5px 6px; font-family:'JetBrains Mono'; color:#67E8F9;">QMH (o QMD + Incendio)</td>
+<td style="padding:5px 6px;">Debe soportar la hora crítica de máxima simultaneidad doméstica.</td>
+</tr>
+</tbody>
+</table>
+</div>""", unsafe_allow_html=True)
+
+    # -------------------------------------------------------------------------
+    # SUSTITUCIÓN NUMÉRICA EN VIVO CON LOS DATOS ACTUALES DEL MODELO
+    # -------------------------------------------------------------------------
+    st.markdown('<div class="card-title" style="margin-top:1.5rem;">🔢 Trazabilidad y Sustitución Numérica en Vivo (Valores del Proyecto)</div>', unsafe_allow_html=True)
+    if results and not calc_error:
+        k_diag_text_qmd = f"QMD = ({results.domestic_flow_L_s:.2f} × {results.k1_coefficient:.2f}) + {results.industrial_flow_L_s:.2f}" if not apply_k_to_ind else f"QMD = {results.total_flow_L_s:.2f} × {results.k1_coefficient:.2f}"
+        k_diag_text_qmh = f"QMH = ({results.domestic_flow_L_s:.2f} × {results.k1_coefficient:.2f} × {results.k2_coefficient:.2f}) + {results.industrial_flow_L_s:.2f}" if not apply_k_to_ind else f"QMH = {results.q_max_daily_flow_L_s:.2f} × {results.k2_coefficient:.2f}"
+
+        st.markdown(f"""
+<div style="background:rgba(14, 38, 59, 0.95); border:1px solid #087E8B; border-radius:12px; padding:1.2rem 1.5rem; font-family:'Inter', sans-serif;">
+<p style="font-size:14px; color:#CBD5E1; margin-bottom:1rem;">
+A continuación se presenta el cálculo paso a paso sustituyendo exactamente los datos de entrada configurados en este momento:
+</p>
+<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1.2rem;">
+
+<div style="background:rgba(10, 25, 40, 0.85); border-left:3px solid #38B6C5; border-radius:6px; padding:0.8rem 1rem;">
+<div style="font-size:12px; color:#38B6C5; font-weight:700;">PASO 1: DOTACIÓN BRUTA (Art. 44)</div>
+<div style="font-family:'JetBrains Mono', monospace; font-size:13px; color:#FFFFFF; margin-top:4px;">
+D_bruta = {results.domestic_endowment_net:.1f} / (1 - {results.domestic_losses_pct/100:.4f})<br>
+<b style="color:#38B6C5;">D_bruta = {results.domestic_endowment_gross:.2f} L/hab·día</b>
+</div>
+</div>
+
+<div style="background:rgba(10, 25, 40, 0.85); border-left:3px solid #087E8B; border-radius:6px; padding:0.8rem 1rem;">
+<div style="font-size:12px; color:#087E8B; font-weight:700;">PASO 2: CAUDAL Y VOLUMEN DOMÉSTICO</div>
+<div style="font-family:'JetBrains Mono', monospace; font-size:13px; color:#FFFFFF; margin-top:4px;">
+Qmd_dom = ({results.domestic_population:,} × {results.domestic_endowment_gross:.2f}) / 86,400<br>
+<b style="color:#087E8B;">Qmd_dom = {results.domestic_flow_L_s:.2f} L/s</b> ({results.domestic_volume_m3_day:,.1f} m³/d)
+</div>
+</div>
+
+<div style="background:rgba(10, 25, 40, 0.85); border-left:3px solid #38B6C5; border-radius:6px; padding:0.8rem 1rem;">
+<div style="font-size:12px; color:#38B6C5; font-weight:700;">PASO 3: CAUDAL Y VOLUMEN INDUSTRIAL</div>
+<div style="font-family:'JetBrains Mono', monospace; font-size:13px; color:#FFFFFF; margin-top:4px;">
+V_ind = Σ Vi = {results.industrial_volume_m3_day:,.2f} m³/día<br>
+Qmd_ind = {results.industrial_volume_m3_day:,.2f} / 86.40<br>
+<b style="color:#38B6C5;">Qmd_ind = {results.industrial_flow_L_s:.2f} L/s</b>
+</div>
+</div>
+
+<div style="background:rgba(10, 25, 40, 0.85); border-left:3px solid #80DEEA; border-radius:6px; padding:0.8rem 1rem;">
+<div style="font-size:12px; color:#80DEEA; font-weight:700;">PASO 4: CAUDAL MEDIO DIARIO TOTAL (Qmd)</div>
+<div style="font-family:'JetBrains Mono', monospace; font-size:13px; color:#FFFFFF; margin-top:4px;">
+Qmd = {results.domestic_flow_L_s:.2f} + {results.industrial_flow_L_s:.2f}<br>
+<b style="color:#80DEEA;">Qmd = {results.total_flow_L_s:.2f} L/s</b> ({results.total_volume_m3_day:,.1f} m³/d)
+</div>
+</div>
+
+<div style="background:rgba(10, 25, 40, 0.85); border-left:3px solid #25866C; border-radius:6px; padding:0.8rem 1rem;">
+<div style="font-size:12px; color:#25866C; font-weight:700;">PASO 5: CAUDAL MÁXIMO DIARIO (QMD)</div>
+<div style="font-family:'JetBrains Mono', monospace; font-size:13px; color:#FFFFFF; margin-top:4px;">
+k₁ = {results.k1_coefficient:.2f}<br>
+{k_diag_text_qmd}<br>
+<b style="color:#25866C;">QMD = {results.q_max_daily_flow_L_s:.2f} L/s</b> ({results.q_max_daily_volume_m3_day:,.1f} m³/d)
+</div>
+</div>
+
+<div style="background:rgba(10, 25, 40, 0.85); border-left:3px solid #83B88C; border-radius:6px; padding:0.8rem 1rem;">
+<div style="font-size:12px; color:#83B88C; font-weight:700;">PASO 6: CAUDAL MÁXIMO HORARIO (QMH)</div>
+<div style="font-family:'JetBrains Mono', monospace; font-size:13px; color:#FFFFFF; margin-top:4px;">
+k₂ = {results.k2_coefficient:.2f}<br>
+{k_diag_text_qmh}<br>
+<b style="color:#83B88C;">QMH = {results.q_max_hourly_flow_L_s:.2f} L/s</b> ({results.q_max_hourly_volume_m3_day:,.1f} m³/d)
+</div>
+</div>
+
+</div>
+</div>
+""", unsafe_allow_html=True)
+    else:
+        st.info("Corrige las inconsistencias o advertencias en los parámetros de entrada para visualizar la sustitución numérica de este proyecto.")
 
 
 # =============================================================================

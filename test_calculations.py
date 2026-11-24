@@ -236,3 +236,61 @@ class TestPDFGeneratorIntegrity:
         pdf_bytes = pdf_buf.getvalue()
         assert len(pdf_bytes) > 1000
         assert pdf_bytes.startswith(b"%PDF")
+
+
+class TestDocumentedIndustrialBenchmarks:
+    """Verifica la integridad técnica y matemática del catálogo de benchmarks industriales."""
+
+    def test_catalog_structure_and_sources(self):
+        from hydrology_engine import DOCUMENTED_INDUSTRIAL_BENCHMARKS
+        assert len(DOCUMENTED_INDUSTRIAL_BENCHMARKS) >= 15
+        
+        for name, data in DOCUMENTED_INDUSTRIAL_BENCHMARKS.items():
+            assert "consumo_tipico" in data, f"Falta consumo_tipico en {name}"
+            assert "unit" in data, f"Falta unit en {name}"
+            assert "horas_op_tipicas" in data, f"Falta horas_op_tipicas en {name}"
+            assert "fuente" in data, f"Falta fuente en {name}"
+
+            assert data["consumo_tipico"] > 0, f"Consumo típico no positivo en {name}"
+            assert 1.0 <= data["horas_op_tipicas"] <= 24.0, f"Horas de operación inválidas en {name}"
+            assert len(data["fuente"].strip()) > 10, f"Fuente no documentada adecuadamente en {name}"
+
+    def test_industrial_calculation_with_benchmarks(self):
+        from hydrology_engine import DOCUMENTED_INDUSTRIAL_BENCHMARKS
+        
+        # Probar cálculo con industrias tomadas del catálogo
+        bench_lacteos = DOCUMENTED_INDUSTRIAL_BENCHMARKS["Planta Láctea / Pasteurizadora (L agua / L leche)"]
+        bench_textil = DOCUMENTED_INDUSTRIAL_BENCHMARKS["Industria Textil - Tintorería (L agua / kg tela procesada)"]
+        
+        rec_lacteos = IndustrialRecord(
+            name="Planta Láctea",
+            mode="specific",
+            units_per_day=50000.0,
+            specific_consumption=bench_lacteos["consumo_tipico"],
+            specific_unit=bench_lacteos["unit"],
+            operating_hours_per_day=bench_lacteos["horas_op_tipicas"],
+            benchmark_source=bench_lacteos["fuente"]
+        )
+        rec_textil = IndustrialRecord(
+            name="Tintorería Textil",
+            mode="specific",
+            units_per_day=2000.0,
+            specific_consumption=bench_textil["consumo_tipico"],
+            specific_unit=bench_textil["unit"],
+            operating_hours_per_day=bench_textil["horas_op_tipicas"],
+            benchmark_source=bench_textil["fuente"]
+        )
+        
+        dom = DomesticDemandInput(15000, 120.0, 15.0, CalculationMode.NORMATIVE_RAS, AltitudeZone.COLD)
+        results = WaterDemandEngine.calculate_total_system_demand(dom, [rec_lacteos, rec_textil])
+        
+        # Comprobar que los volúmenes son positivos y coherentes
+        assert results.industrial_volume_m3_day > 0
+        assert results.industrial_flow_L_s > 0
+        assert results.total_flow_L_s > results.domestic_flow_L_s
+        assert len(results.industrial_details) == 2
+        
+        # Verificar caudal operativo Qop > Qmd para cada industria con Hop < 24
+        for det in results.industrial_details:
+            assert det["Caudal en Turno Operativo (L/s)"] > det["Caudal Medio 24h (L/s)"]
+
