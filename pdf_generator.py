@@ -1,6 +1,7 @@
 """
 Generador de Memorias de Cálculo en PDF
-Calculadora de Demanda Doméstica e Industrial de Agua
+AQUAMARIS - Plataforma de Demanda Hídrica
+Paleta Corporativa Aqua Natura
 """
 
 import io
@@ -20,16 +21,19 @@ from reportlab.platypus import (
 from hydrology_engine import WaterDemandResults
 
 
-# Paleta corporativa ReportLab
-C_PRIMARY = colors.HexColor("#123047")    # Azul petróleo
-C_SECONDARY = colors.HexColor("#149D9A")  # Turquesa técnico
-C_LIGHT_BG = colors.HexColor("#F7F9FC")   # Fondo gris técnico
+# Paleta corporativa "Aqua Natura"
+C_PRIMARY = colors.HexColor("#123047")    # Azul profundo
+C_RIVER = colors.HexColor("#087E8B")      # Azul río
+C_TURQUOISE = colors.HexColor("#38B6C5")  # Turquesa agua
+C_FOREST = colors.HexColor("#25866C")     # Verde bosque
+C_NATURE = colors.HexColor("#83B88C")     # Verde natural
+C_MIST = colors.HexColor("#F4F9F8")       # Blanco niebla
 C_DARK = colors.HexColor("#0F172A")
 C_BORDER = colors.HexColor("#CBD5E1")
 
 
 def generate_professional_pdf(results: WaterDemandResults) -> io.BytesIO:
-    """Genera una memoria de cálculo técnica en PDF con maquetación profesional."""
+    """Genera una memoria de cálculo técnica en PDF con la identidad AQUAMARIS."""
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
         buffer,
@@ -42,49 +46,48 @@ def generate_professional_pdf(results: WaterDemandResults) -> io.BytesIO:
 
     styles = getSampleStyleSheet()
 
-    # Estilos tipográficos personalizados
     title_style = ParagraphStyle(
         "DocTitle",
         parent=styles["Heading1"],
         fontName="Helvetica-Bold",
-        fontSize=16,
+        fontSize=15,
         textColor=C_PRIMARY,
-        spaceAfter=4,
+        spaceAfter=3,
         alignment=0
     )
     subtitle_style = ParagraphStyle(
         "DocSubtitle",
         parent=styles["Normal"],
         fontName="Helvetica",
-        fontSize=9,
+        fontSize=8.5,
         textColor=colors.HexColor("#475569"),
-        spaceAfter=12
+        spaceAfter=10
     )
     h2_style = ParagraphStyle(
         "SectionHeader",
         parent=styles["Heading2"],
         fontName="Helvetica-Bold",
-        fontSize=11,
+        fontSize=10.5,
         textColor=C_PRIMARY,
-        spaceBefore=10,
-        spaceAfter=6
+        spaceBefore=9,
+        spaceAfter=5
     )
     body_style = ParagraphStyle(
         "BodyTextCustom",
         parent=styles["Normal"],
         fontName="Helvetica",
-        fontSize=8.5,
+        fontSize=8,
         textColor=C_DARK,
         leading=11
     )
 
     story = []
 
-    # 1. Encabezado principal
-    story.append(Paragraph("MEMORIA TÉCNICA DE DEMANDA DE AGUA POTABLE E INDUSTRIAL", title_style))
+    # 1. Encabezado principal AQUAMARIS
+    story.append(Paragraph("AQUAMARIS | MEMORIA TÉCNICA DE DEMANDA DE AGUA", title_style))
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    story.append(Paragraph(f"Proyecto: CalculadoraDemanda | Fecha de Emisión: {now_str} | Marco: {results.calculation_mode.value}", subtitle_style))
-    story.append(HRFlowable(width="100%", thickness=1.5, color=C_SECONDARY, spaceAfter=10))
+    story.append(Paragraph(f"Plataforma de Ingeniería Hídrica | Fecha: {now_str} | Marco: {results.calculation_mode.value}", subtitle_style))
+    story.append(HRFlowable(width="100%", thickness=1.5, color=C_RIVER, spaceAfter=8))
 
     # 2. Resumen General de Caudales
     story.append(Paragraph("1. BALANCE CONSOLIDADO DE CAUDALES DE DISEÑO", h2_style))
@@ -107,15 +110,15 @@ def generate_professional_pdf(results: WaterDemandResults) -> io.BytesIO:
         ("ALIGN", (0, 0), (-1, 0), "CENTER"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
         ("GRID", (0, 0), (-1, -1), 0.5, C_BORDER),
-        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, C_LIGHT_BG]),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, C_MIST]),
         ("FONTNAME", (0, 1), (0, -1), "Helvetica"),
         ("FONTSIZE", (0, 1), (-1, -1), 8),
         ("ALIGN", (1, 1), (3, -1), "RIGHT"),
         ("FONTNAME", (0, 3), (-1, 3), "Helvetica-Bold"),
-        ("BACKGROUND", (0, 3), (-1, 3), colors.HexColor("#E0F2FE")),
+        ("BACKGROUND", (0, 3), (-1, 3), colors.HexColor("#E0F7F6")),
     ]))
     story.append(t_summary)
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 8))
 
     # 3. Parámetros de Entrada y Verificación RAS 0330
     story.append(Paragraph("2. PARÁMETROS BÁSICOS Y AUDITORÍA NORMATIVA RAS 0330", h2_style))
@@ -126,20 +129,20 @@ def generate_professional_pdf(results: WaterDemandResults) -> io.BytesIO:
         ["Dotación Neta (Dneta)", f"{results.domestic_endowment_net:.1f} L/hab·día", f"Límite RAS Art. 43: {results.altitude_zone.value}", "CONFORME" if results.domestic_endowment_net <= 140.0 else "OBSERVACIÓN"],
         ["Pérdidas Técnicas en Red (%P)", f"{results.domestic_losses_pct:.1f}%", "Límite RAS Art. 44: ≤ 25.0% de pérdidas", "CONFORME" if results.domestic_losses_pct <= 25.0 else "NO CONFORME"],
         ["Dotación Bruta de Diseño (Dbruta)", f"{results.domestic_endowment_gross:.2f} L/hab·día", "Dbruta = Dneta / (1 - %P/100)", "CALCULADO"],
-        ["Coeficiente Diario (k1)", f"{results.k1_coefficient:.2f}", "Art. 47 Res. 0330 (rango usual 1.20 - 1.30)", "CONFORME"],
-        ["Coeficiente Horario (k2)", f"{results.k2_coefficient:.2f}", "Art. 48 Res. 0330 (rango usual 1.40 - 1.60)", "CONFORME"],
+        ["Coeficiente Diario (k1)", f"{results.k1_coefficient:.2f}", "Art. 47 Res. 0330 (típico 1.20 - 1.30)", "CONFORME"],
+        ["Coeficiente Horario (k2)", f"{results.k2_coefficient:.2f}", "Art. 48 Res. 0330 (típico 1.40 - 1.60)", "CONFORME"],
     ]
 
     t_params = Table(params_data, colWidths=[150, 100, 210, 80])
     t_params.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), C_PRIMARY),
+        ("BACKGROUND", (0, 0), (-1, 0), C_RIVER),
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("FONTSIZE", (0, 0), (-1, 0), 8.5),
         ("ALIGN", (0, 0), (-1, 0), "CENTER"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
         ("GRID", (0, 0), (-1, -1), 0.5, C_BORDER),
-        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, C_LIGHT_BG]),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, C_MIST]),
         ("FONTNAME", (0, 1), (0, -1), "Helvetica"),
         ("FONTSIZE", (0, 1), (-1, -1), 8),
         ("ALIGN", (1, 1), (1, -1), "RIGHT"),
@@ -147,7 +150,7 @@ def generate_professional_pdf(results: WaterDemandResults) -> io.BytesIO:
         ("FONTNAME", (3, 1), (3, -1), "Helvetica-Bold"),
     ]))
     story.append(t_params)
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 8))
 
     # 4. Desglose Industrial
     if results.industrial_details:
@@ -174,19 +177,19 @@ def generate_professional_pdf(results: WaterDemandResults) -> io.BytesIO:
             ("ALIGN", (0, 0), (-1, 0), "CENTER"),
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
             ("GRID", (0, 0), (-1, -1), 0.5, C_BORDER),
-            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, C_LIGHT_BG]),
+            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, C_MIST]),
             ("FONTSIZE", (0, 1), (-1, -1), 8),
             ("ALIGN", (3, 1), (-1, -1), "RIGHT"),
         ]))
         story.append(t_ind)
-        story.append(Spacer(1, 10))
+        story.append(Spacer(1, 8))
 
-    # 5. Notas Técnicas de Cierre
+    # 5. Notas Técnicas
     story.append(Paragraph("4. NOTAS TÉCNICAS Y RECOMENDACIONES DE INGENIERÍA", h2_style))
     notes_text = """
     <b>Principio de Continuidad:</b> 1 L/s continuo durante 24 horas equivale exactamente a 86.40 m³/día.<br/>
     <b>Separación de Caudales:</b> El caudal Qmd debe emplearse en balances hidrológicos y solicitudes de concesión. 
-    Los caudales QMD y QMH se reservan exclusivamente para el dimensionamiento mecánico e hidráulico de tuberías, estructuras y plantas.<br/>
+    Los caudales QMD y QMH se reservan exclusivamente para el dimensionamiento mecánico e hidráulico de obras civiles.<br/>
     <b>Régimen Industrial:</b> Se asume amortiguamiento mediante tanque de reserva propio salvo indicación en contrario.
     """
     story.append(Paragraph(notes_text, body_style))

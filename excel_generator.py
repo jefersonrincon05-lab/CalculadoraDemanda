@@ -1,7 +1,7 @@
 """
 Generador de Memorias de Cálculo en Excel
-Calculadora de Demanda Doméstica e Industrial de Agua
-Cumplimiento estricto de estándares de auditoría y presentación profesional
+AQUAMARIS - Calculadora de Demanda Doméstica e Industrial de Agua
+Paleta Corporativa Aqua Natura
 """
 
 from datetime import datetime
@@ -15,15 +15,14 @@ from openpyxl.chart import BarChart, Reference
 from hydrology_engine import WaterDemandResults, FACTOR_LS_TO_M3DAY
 
 
-# Paleta cromática corporativa de ingeniería
-COLOR_PRIMARY = "123047"    # Azul petróleo profundo
-COLOR_SECONDARY = "149D9A"  # Turquesa técnico
-COLOR_ACCENT = "0284C7"     # Azul cian
-COLOR_LIGHT_BG = "F7F9FC"   # Fondo gris técnico muy suave
-COLOR_HEADER_BG = "123047"  # Fondo encabezados
+# Paleta corporativa "Aqua Natura"
+COLOR_PRIMARY = "123047"    # Azul profundo (encabezado y títulos)
+COLOR_RIVER = "087E8B"      # Azul río (subtítulos y elementos activos)
+COLOR_TURQUOISE = "38B6C5"  # Turquesa agua (acentos y curvas)
+COLOR_FOREST = "25866C"     # Verde bosque (indicadores conformes)
+COLOR_NATURE = "83B88C"     # Verde natural (detalles ecológicos)
+COLOR_MIST_BG = "F4F9F8"    # Blanco niebla (fondo general)
 COLOR_WHITE = "FFFFFF"
-COLOR_SUCCESS = "16A34A"
-COLOR_CARD_BG = "F1F5F9"
 COLOR_BORDER = "CBD5E1"
 
 
@@ -40,7 +39,7 @@ def apply_cell_styles(
     border_color=COLOR_BORDER,
     number_format=None
 ):
-    """Aplica estilos consistentes a una celda de Excel."""
+    """Aplica estilos consistentes inspirados en la paleta Aqua Natura."""
     cell.font = Font(name="Segoe UI", size=font_size, bold=font_bold, color=font_color)
     if bg_color:
         cell.fill = PatternFill(start_color=bg_color, end_color=bg_color, fill_type="solid")
@@ -60,7 +59,6 @@ def auto_fit_columns(ws, min_width=12, padding=3):
         max_len = 0
         col_letter = get_column_letter(col[0].column)
         for cell in col:
-            # Ignorar celdas combinadas largas en filas de títulos
             if cell.row in [1, 2, 3]:
                 continue
             val_str = str(cell.value or "")
@@ -71,15 +69,15 @@ def auto_fit_columns(ws, min_width=12, padding=3):
 
 def generate_professional_excel(results: WaterDemandResults) -> io.BytesIO:
     """
-    Genera un libro Excel con 5 hojas técnicas estructuradas:
-    1. 01_Resumen: Cuadro de mando ejecutivo, indicadores y gráfica.
-    2. 02_Datos_Entrada: Parámetros del proyecto, marco normativo e hipótesis.
-    3. 03_Memoria_Calculo: Fórmulas comprobables en celdas de Excel.
-    4. 04_Detalle_Industrial: Inventario y caudales en turno de cada industria.
-    5. 05_Verificacion: Comparación Python vs Excel y chequeo normativo RAS 0330.
+    Genera un libro Excel con 5 hojas técnicas estructuradas y ambientadas en Aqua Natura:
+    1. 01_Resumen
+    2. 02_Datos_Entrada
+    3. 03_Memoria_Calculo
+    4. 04_Detalle_Industrial
+    5. 05_Verificacion
     """
     wb = openpyxl.Workbook()
-    wb.remove(wb.active)  # Remover hoja por defecto
+    wb.remove(wb.active)
 
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -89,16 +87,14 @@ def generate_professional_excel(results: WaterDemandResults) -> io.BytesIO:
     ws1 = wb.create_sheet(title="01_Resumen")
     ws1.views.sheetView[0].showGridLines = True
 
-    # Encabezado Corporativo
     ws1.merge_cells("A1:G1")
-    ws1["A1"] = "MEMORIA TÉCNICA DE DEMANDA DE AGUA POTABLE E INDUSTRIAL"
-    apply_cell_styles(ws1["A1"], font_bold=True, font_color=COLOR_WHITE, font_size=14, bg_color=COLOR_PRIMARY, alignment_h="center")
+    ws1["A1"] = "AQUAMARIS | MEMORIA TÉCNICA DE DEMANDA DE AGUA POTABLE E INDUSTRIAL"
+    apply_cell_styles(ws1["A1"], font_bold=True, font_color=COLOR_WHITE, font_size=13, bg_color=COLOR_PRIMARY, alignment_h="center")
 
     ws1.merge_cells("A2:G2")
-    ws1["A2"] = f"Resumen Ejecutivo del Sistema | Fecha de Generación: {now_str} | Marco: {results.calculation_mode.value}"
-    apply_cell_styles(ws1["A2"], font_bold=False, font_color="CBD5E1", font_size=9, bg_color="1E293B", alignment_h="center")
+    ws1["A2"] = f"Resumen Ejecutivo del Sistema Hidráulico | Fecha: {now_str} | Marco: {results.calculation_mode.value}"
+    apply_cell_styles(ws1["A2"], font_bold=False, font_color=COLOR_TURQUOISE, font_size=9, bg_color=COLOR_PRIMARY, alignment_h="center")
 
-    # Tabla Resumen de Caudales Consolidados
     ws1.cell(row=4, column=1, value="PARÁMETRO HIDRÁULICO")
     ws1.cell(row=4, column=2, value="CAUDAL (L/s)")
     ws1.cell(row=4, column=3, value="VOLUMEN (m³/día)")
@@ -106,18 +102,18 @@ def generate_professional_excel(results: WaterDemandResults) -> io.BytesIO:
     ws1.cell(row=4, column=5, value="DESTINO DE DISEÑO SANITARIO")
 
     for col in range(1, 6):
-        apply_cell_styles(ws1.cell(row=4, column=col), font_bold=True, font_color=COLOR_WHITE, font_size=10, bg_color=COLOR_PRIMARY, alignment_h="center")
+        apply_cell_styles(ws1.cell(row=4, column=col), font_bold=True, font_color=COLOR_WHITE, font_size=10, bg_color=COLOR_RIVER, alignment_h="center")
 
     summary_rows = [
         ("Demanda Doméstica Media (Qmd_dom)", results.domestic_flow_L_s, results.domestic_volume_m3_day, results.domestic_pct / 100.0, "Consumo residencial continuo 24 horas"),
-        ("Demanda Industrial Media (Qmd_ind)", results.industrial_flow_L_s, results.industrial_volume_m3_day, results.industrial_pct / 100.0, "Consumo fabril acumulado de procesos"),
-        ("Demanda Media Diaria Total (Qmd)", results.total_flow_L_s, results.total_volume_m3_day, 1.0, "Concesiones de agua y balances hídricos"),
+        ("Demanda Industrial Media (Qmd_ind)", results.industrial_flow_L_s, results.industrial_volume_m3_day, results.industrial_pct / 100.0, "Consumo productivo acumulado"),
+        ("Demanda Media Diaria Total (Qmd)", results.total_flow_L_s, results.total_volume_m3_day, 1.0, "Concesión de aguas y balance hídrico"),
         ("Caudal Máximo Diario (QMD)", results.q_max_daily_flow_L_s, results.q_max_daily_volume_m3_day, "-", "Captación, desarenador, aducción, PTAP y tanques"),
         ("Caudal Máximo Horario (QMH)", results.q_max_hourly_flow_L_s, results.q_max_hourly_volume_m3_day, "-", "Red de distribución y estaciones de bombeo"),
     ]
 
     for idx, (param, q_ls, vol_m3, pct, dest) in enumerate(summary_rows, start=5):
-        bg = "FFFFFF" if idx % 2 == 1 else COLOR_CARD_BG
+        bg = COLOR_WHITE if idx % 2 == 1 else COLOR_MIST_BG
         c1 = ws1.cell(row=idx, column=1, value=param)
         c2 = ws1.cell(row=idx, column=2, value=float(q_ls))
         c3 = ws1.cell(row=idx, column=3, value=float(vol_m3))
@@ -125,16 +121,16 @@ def generate_professional_excel(results: WaterDemandResults) -> io.BytesIO:
         c5 = ws1.cell(row=idx, column=5, value=dest)
 
         apply_cell_styles(c1, font_bold=(idx in [7, 8, 9]), font_size=10, bg_color=bg, alignment_h="left")
-        apply_cell_styles(c2, font_bold=(idx in [7, 8, 9]), font_size=10, bg_color=bg, alignment_h="right", number_format="#,##0.000")
+        apply_cell_styles(c2, font_bold=(idx in [7, 8, 9]), font_color=COLOR_RIVER if idx in [7, 8] else "000000", font_size=10, bg_color=bg, alignment_h="right", number_format="#,##0.000")
         apply_cell_styles(c3, font_bold=(idx in [7, 8, 9]), font_size=10, bg_color=bg, alignment_h="right", number_format="#,##0.00")
         apply_cell_styles(c4, font_bold=False, font_size=10, bg_color=bg, alignment_h="center", number_format="0.0%" if isinstance(pct, (int, float)) else None)
         apply_cell_styles(c5, font_bold=False, font_size=9, bg_color=bg, alignment_h="left")
 
-    # Gráfica de Barras de Caudales en Hoja Resumen
+    # Gráfica de Barras
     chart = BarChart()
     chart.type = "col"
     chart.style = 10
-    chart.title = "Comparativa de Caudales del Sistema (L/s)"
+    chart.title = "AQUAMARIS - Comparativa de Caudales de Diseño (L/s)"
     chart.y_axis.title = "Caudal (L/s)"
     chart.x_axis.title = "Caudal Hidráulico"
     chart.height = 11
@@ -157,19 +153,19 @@ def generate_professional_excel(results: WaterDemandResults) -> io.BytesIO:
     ws2.views.sheetView[0].showGridLines = True
 
     ws2.merge_cells("A1:D1")
-    ws2["A1"] = "PARÁMETROS Y DATOS DE ENTRADA DEL PROYECTO"
+    ws2["A1"] = "PARÁMETROS Y DATOS DE ENTRADA DEL SISTEMA"
     apply_cell_styles(ws2["A1"], font_bold=True, font_color=COLOR_WHITE, font_size=12, bg_color=COLOR_PRIMARY, alignment_h="center")
 
     headers_in = ["VARIABLE / CASILLA", "VALOR INGRESADO", "UNIDAD", "CRITERIO / MARCO NORMATIVO"]
     for c_idx, h in enumerate(headers_in, start=1):
         cell = ws2.cell(row=3, column=c_idx, value=h)
-        apply_cell_styles(cell, font_bold=True, font_color=COLOR_WHITE, font_size=10, bg_color=COLOR_PRIMARY, alignment_h="center")
+        apply_cell_styles(cell, font_bold=True, font_color=COLOR_WHITE, font_size=10, bg_color=COLOR_RIVER, alignment_h="center")
 
     inputs_rows = [
-        ("Marco Normativo Seleccionado", results.calculation_mode.value, "adimensional", "Resolución 0330 de 2017 o Modo Libre"),
+        ("Marco Normativo Seleccionado", results.calculation_mode.value, "adimensional", "Resolución 0330 de 2017 o Modo Exploratorio"),
         ("Zona de Altitud / Piso Térmico", results.altitude_zone.value, "msnm", "Criterio de clasificación Art. 43 Res. 0330"),
         ("Población de Diseño (P)", results.domestic_population, "habitantes", "Horizonte de proyección censal del sistema"),
-        ("Dotación Neta (Dneta)", results.domestic_endowment_net, "L/hab·día", "Consumo per cápita neto según altitud"),
+        ("Dotación Neta (Dneta)", results.domestic_endowment_net, "L/hab·día", "Consumo per cápita neto según piso térmico"),
         ("Pérdidas Técnicas en Red (%P)", results.domestic_losses_pct / 100.0, "porcentaje", "Límite RAS Art. 44: ≤ 25.0%"),
         ("Coeficiente de Variación Diaria (k1)", results.k1_coefficient, "adimensional", "Art. 47 Res. 0330 (típico 1.20 - 1.30)"),
         ("Coeficiente de Variación Horaria (k2)", results.k2_coefficient, "adimensional", "Art. 48 Res. 0330 (típico 1.40 - 1.60)"),
@@ -178,7 +174,7 @@ def generate_professional_excel(results: WaterDemandResults) -> io.BytesIO:
     ]
 
     for idx, (var, val, unit, crit) in enumerate(inputs_rows, start=4):
-        bg = "FFFFFF" if idx % 2 == 0 else COLOR_CARD_BG
+        bg = COLOR_WHITE if idx % 2 == 0 else COLOR_MIST_BG
         c1 = ws2.cell(row=idx, column=1, value=var)
         c2 = ws2.cell(row=idx, column=2, value=val)
         c3 = ws2.cell(row=idx, column=3, value=unit)
@@ -191,7 +187,7 @@ def generate_professional_excel(results: WaterDemandResults) -> io.BytesIO:
             num_fmt = "0.0%" if unit == "porcentaje" else "#,##0.00"
 
         apply_cell_styles(c1, font_bold=False, font_size=10, bg_color=bg, alignment_h="left")
-        apply_cell_styles(c2, font_bold=True, font_size=10, bg_color=bg, alignment_h="right" if isinstance(val, (int, float)) else "center", number_format=num_fmt)
+        apply_cell_styles(c2, font_bold=True, font_color=COLOR_PRIMARY if isinstance(val, (int, float)) else "000000", font_size=10, bg_color=bg, alignment_h="right" if isinstance(val, (int, float)) else "center", number_format=num_fmt)
         apply_cell_styles(c3, font_bold=False, font_size=9, bg_color=bg, alignment_h="center")
         apply_cell_styles(c4, font_bold=False, font_size=9, bg_color=bg, alignment_h="left")
 
@@ -199,7 +195,7 @@ def generate_professional_excel(results: WaterDemandResults) -> io.BytesIO:
     auto_fit_columns(ws2, min_width=14)
 
     # =========================================================================
-    # HOJA 3: 03_Memoria_Calculo (Con Fórmulas Reales Comprobables en Celdas)
+    # HOJA 3: 03_Memoria_Calculo (Con Fórmulas Auditables)
     # =========================================================================
     ws3 = wb.create_sheet(title="03_Memoria_Calculo")
     ws3.views.sheetView[0].showGridLines = True
@@ -211,15 +207,8 @@ def generate_professional_excel(results: WaterDemandResults) -> io.BytesIO:
     headers_mem = ["PASO", "DESCRIPCIÓN DE LA ECUACIÓN", "EXPRESIÓN TEÓRICA", "FÓRMULA AUDITABLE EN CELDA", "RESULTADO EXCEL", "UNIDAD"]
     for c_idx, h in enumerate(headers_mem, start=1):
         cell = ws3.cell(row=3, column=c_idx, value=h)
-        apply_cell_styles(cell, font_bold=True, font_color=COLOR_WHITE, font_size=10, bg_color=COLOR_PRIMARY, alignment_h="center")
+        apply_cell_styles(cell, font_bold=True, font_color=COLOR_WHITE, font_size=10, bg_color=COLOR_RIVER, alignment_h="center")
 
-    # Filas con fórmulas enlazadas a 02_Datos_Entrada
-    # Referencias en ws2:
-    # B6 = Población
-    # B7 = Dotación Neta
-    # B8 = Pérdidas Técnicas
-    # B9 = k1
-    # B10 = k2
     calc_steps = [
         ("1", "Dotación Bruta de Diseño (Dbruta)", "Dneta / (1 - %P/100)", "='02_Datos_Entrada'!B7/(1-'02_Datos_Entrada'!B8)", "#,##0.00", "L/hab·día"),
         ("2", "Volumen Diario Doméstico (Vdom)", "P × Dbruta / 1000", "='02_Datos_Entrada'!B6*E4/1000", "#,##0.00", "m³/día"),
@@ -235,7 +224,7 @@ def generate_professional_excel(results: WaterDemandResults) -> io.BytesIO:
     ]
 
     for idx, (step_num, desc, theo, fmla, num_fmt, unit) in enumerate(calc_steps, start=4):
-        bg = "FFFFFF" if idx % 2 == 0 else COLOR_CARD_BG
+        bg = COLOR_WHITE if idx % 2 == 0 else COLOR_MIST_BG
         c1 = ws3.cell(row=idx, column=1, value=step_num)
         c2 = ws3.cell(row=idx, column=2, value=desc)
         c3 = ws3.cell(row=idx, column=3, value=theo)
@@ -266,11 +255,11 @@ def generate_professional_excel(results: WaterDemandResults) -> io.BytesIO:
     headers_ind = ["ID", "INDUSTRIA / RAZÓN SOCIAL", "MÉTODO", "HORAS OPERACIÓN (Hop)", "VOLUMEN (m³/día)", "Qmd 24h (L/s)", "Q TURNO (L/s)", "FUENTE TÉCNICA DOCUMENTADA"]
     for c_idx, h in enumerate(headers_ind, start=1):
         cell = ws4.cell(row=3, column=c_idx, value=h)
-        apply_cell_styles(cell, font_bold=True, font_color=COLOR_WHITE, font_size=10, bg_color=COLOR_PRIMARY, alignment_h="center")
+        apply_cell_styles(cell, font_bold=True, font_color=COLOR_WHITE, font_size=10, bg_color=COLOR_RIVER, alignment_h="center")
 
     if results.industrial_details:
         for idx, rec in enumerate(results.industrial_details, start=4):
-            bg = "FFFFFF" if idx % 2 == 0 else COLOR_CARD_BG
+            bg = COLOR_WHITE if idx % 2 == 0 else COLOR_MIST_BG
             c1 = ws4.cell(row=idx, column=1, value=idx - 3)
             c2 = ws4.cell(row=idx, column=2, value=rec.get("Nombre", "Industria"))
             c3 = ws4.cell(row=idx, column=3, value=rec.get("Método", "Directo"))
@@ -289,7 +278,6 @@ def generate_professional_excel(results: WaterDemandResults) -> io.BytesIO:
             apply_cell_styles(c7, font_bold=False, font_size=10, bg_color=bg, alignment_h="right", number_format="#,##0.000")
             apply_cell_styles(c8, font_bold=False, font_size=8, font_color="475569", bg_color=bg, alignment_h="left")
 
-        # Fila Totalizadora con función SUM()
         tot_row = len(results.industrial_details) + 4
         ws4.cell(row=tot_row, column=2, value="TOTAL CONSOLIDADO INDUSTRIAL")
         ws4.cell(row=tot_row, column=5, value=f"=SUM(E4:E{tot_row-1})")
@@ -305,7 +293,7 @@ def generate_professional_excel(results: WaterDemandResults) -> io.BytesIO:
     auto_fit_columns(ws4, min_width=14)
 
     # =========================================================================
-    # HOJA 5: 05_Verificacion (Auditoría de Concordancia Python vs Excel)
+    # HOJA 5: 05_Verificacion (Auditoría Concordancia Python vs Excel)
     # =========================================================================
     ws5 = wb.create_sheet(title="05_Verificacion")
     ws5.views.sheetView[0].showGridLines = True
@@ -317,7 +305,7 @@ def generate_professional_excel(results: WaterDemandResults) -> io.BytesIO:
     headers_ver = ["VARIABLE AUDITADA", "VALOR PYTHON (MOTOR)", "VALOR REFERENCIA EXCEL", "UNIDAD", "DIFERENCIA ABSOLUTA", "TOLERANCIA", "ESTADO CONCORDANCIA"]
     for c_idx, h in enumerate(headers_ver, start=1):
         cell = ws5.cell(row=3, column=c_idx, value=h)
-        apply_cell_styles(cell, font_bold=True, font_color=COLOR_WHITE, font_size=10, bg_color=COLOR_PRIMARY, alignment_h="center")
+        apply_cell_styles(cell, font_bold=True, font_color=COLOR_WHITE, font_size=10, bg_color=COLOR_RIVER, alignment_h="center")
 
     verif_checks = [
         ("Dotación Bruta de Diseño", results.domestic_endowment_gross, "='03_Memoria_Calculo'!E4", "L/hab·día"),
@@ -331,7 +319,7 @@ def generate_professional_excel(results: WaterDemandResults) -> io.BytesIO:
     ]
 
     for idx, (var_name, py_val, xl_ref, unit) in enumerate(verif_checks, start=4):
-        bg = "FFFFFF" if idx % 2 == 0 else COLOR_CARD_BG
+        bg = COLOR_WHITE if idx % 2 == 0 else COLOR_MIST_BG
         c1 = ws5.cell(row=idx, column=1, value=var_name)
         c2 = ws5.cell(row=idx, column=2, value=float(py_val))
         c3 = ws5.cell(row=idx, column=3, value=xl_ref)
@@ -346,12 +334,11 @@ def generate_professional_excel(results: WaterDemandResults) -> io.BytesIO:
         apply_cell_styles(c4, font_bold=False, font_size=9, bg_color=bg, alignment_h="center")
         apply_cell_styles(c5, font_bold=False, font_size=9, bg_color=bg, alignment_h="right", number_format="0.000000")
         apply_cell_styles(c6, font_bold=False, font_size=9, bg_color=bg, alignment_h="right", number_format="0.000000")
-        apply_cell_styles(c7, font_bold=True, font_color=COLOR_SUCCESS, font_size=10, bg_color="DCFCE7", alignment_h="center")
+        apply_cell_styles(c7, font_bold=True, font_color=COLOR_FOREST, font_size=10, bg_color="DCFCE7", alignment_h="center")
 
-    # Auditoría Normativa RAS 0330 en hoja 5
     ws5.cell(row=14, column=1, value="CONTROL NORMATIVO RAS 0330 (MINVIVIENDA COLOMBIA)")
     ws5.merge_cells("A14:G14")
-    apply_cell_styles(ws5["A14"], font_bold=True, font_color=COLOR_WHITE, font_size=10, bg_color=COLOR_SECONDARY, alignment_h="center")
+    apply_cell_styles(ws5["A14"], font_bold=True, font_color=COLOR_WHITE, font_size=10, bg_color=COLOR_FOREST, alignment_h="center")
 
     ras_checks = [
         ("Artículo 43: Dotación neta máxima admisible", f"Dotación neta = {results.domestic_endowment_net:.1f} L/hab·d (Límite piso {results.altitude_zone.value})", "CONFORME" if (results.domestic_endowment_net <= 140.0) else "OBSERVACIÓN"),
@@ -361,7 +348,7 @@ def generate_professional_excel(results: WaterDemandResults) -> io.BytesIO:
     ]
 
     for idx, (articulo, desc, estado) in enumerate(ras_checks, start=15):
-        bg = "FFFFFF" if idx % 2 == 0 else COLOR_CARD_BG
+        bg = COLOR_WHITE if idx % 2 == 0 else COLOR_MIST_BG
         c1 = ws5.cell(row=idx, column=1, value=articulo)
         c2 = ws5.cell(row=idx, column=2, value=desc)
         ws5.merge_cells(f"B{idx}:F{idx}")
@@ -370,12 +357,11 @@ def generate_professional_excel(results: WaterDemandResults) -> io.BytesIO:
         apply_cell_styles(c1, font_bold=True, font_size=9, bg_color=bg, alignment_h="left")
         apply_cell_styles(c2, font_bold=False, font_size=9, bg_color=bg, alignment_h="left")
         is_conf = "CONFORME" in estado
-        apply_cell_styles(c7, font_bold=True, font_color=COLOR_SUCCESS if is_conf else "B91C1C", font_size=9, bg_color="DCFCE7" if is_conf else "FEE2E2", alignment_h="center")
+        apply_cell_styles(c7, font_bold=True, font_color=COLOR_FOREST if is_conf else "B91C1C", font_size=9, bg_color="DCFCE7" if is_conf else "FEE2E2", alignment_h="center")
 
     ws5.freeze_panes = "A4"
     auto_fit_columns(ws5, min_width=14)
 
-    # Configuración de Impresión para todas las hojas
     for ws in wb.worksheets:
         ws.page_setup.orientation = ws.ORIENTATION_LANDSCAPE
         ws.page_setup.paperSize = ws.PAPERSIZE_A4
@@ -383,7 +369,6 @@ def generate_professional_excel(results: WaterDemandResults) -> io.BytesIO:
         ws.page_setup.fitToWidth = 1
         ws.page_setup.fitToHeight = 0
 
-    # Guardar en memoria BytesIO
     output = io.BytesIO()
     wb.save(output)
     output.seek(0)

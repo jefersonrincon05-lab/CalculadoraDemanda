@@ -1,6 +1,7 @@
 """
-Calculadora de Demanda Doméstica e Industrial de Agua
-Versión 3.0 - Rediseño Profesional, Auditoría Técnica y Cumplimiento Normativo RAS 0330
+AQUAMARIS - Plataforma de Ingeniería Hídrica & Demanda de Agua
+Ambientación Marina Inspirada en la Paleta "Aqua Natura"
+Versión 4.0 - Identidad de Marca, Animaciones de Olas Oceánicas y Auditoría RAS 0330
 """
 
 import io
@@ -35,163 +36,301 @@ from pdf_generator import generate_professional_pdf
 # CONFIGURACIÓN DE PÁGINA STREAMLIT
 # -----------------------------------------------------------------------------
 st.set_page_config(
-    page_title="Calculadora de Demanda de Agua | Ingeniería Hidráulica",
-    page_icon="💧",
+    page_title="AQUAMARIS | Plataforma de Demanda Hídrica",
+    page_icon="🌊",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
 # -----------------------------------------------------------------------------
-# ESTILOS CSS PERSONALIZADOS (PALETA PROFESIONAL SOBRIA)
-# Paleta:
-# Azul petróleo: #123047 | Turquesa: #149D9A | Fondo: #F7F9FC | Blanco: #FFFFFF
+# CÓDIGO VECTORIAL DEL LOGO OFICIAL "AQUAMARIS" (SVG EMBEBIDO)
+# -----------------------------------------------------------------------------
+AQUAMARIS_LOGO_SVG = """
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="100%" height="100%">
+  <defs>
+    <linearGradient id="oceanShield" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#123047" />
+      <stop offset="60%" stop-color="#087E8B" />
+      <stop offset="100%" stop-color="#25866C" />
+    </linearGradient>
+    <linearGradient id="waveTurquoise" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#087E8B" />
+      <stop offset="50%" stop-color="#38B6C5" />
+      <stop offset="100%" stop-color="#83B88C" />
+    </linearGradient>
+    <linearGradient id="dropletGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#38B6C5" />
+      <stop offset="100%" stop-color="#087E8B" />
+    </linearGradient>
+    <filter id="aquaGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="5" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <circle cx="120" cy="120" r="108" fill="url(#oceanShield)" stroke="#38B6C5" stroke-width="4" stroke-opacity="0.9" />
+  <circle cx="120" cy="120" r="98" fill="none" stroke="#F4F9F8" stroke-width="1.5" stroke-dasharray="6,4" stroke-opacity="0.4" />
+  <path d="M 38 135 C 55 105, 95 80, 140 100 C 175 116, 195 95, 202 85 C 195 140, 160 195, 120 198 C 80 200, 48 170, 38 135 Z" fill="url(#waveTurquoise)" opacity="0.9" />
+  <path d="M 45 145 C 70 125, 110 115, 145 130 C 170 142, 185 130, 192 120 C 182 165, 150 190, 120 190 C 85 190, 58 170, 45 145 Z" fill="#123047" opacity="0.65" />
+  <path d="M 120 52 C 120 52, 90 94, 90 120 C 90 136.5, 103.5 150, 120 150 C 136.5 150, 150 136.5, 150 120 C 150 94, 120 52, 120 52 Z" fill="url(#dropletGrad)" filter="url(#aquaGlow)" stroke="#F4F9F8" stroke-width="2.5" />
+  <ellipse cx="110" cy="110" rx="9" ry="14" transform="rotate(-30 110 110)" fill="#F4F9F8" opacity="0.75" />
+  <circle cx="132" cy="130" r="3.5" fill="#F4F9F8" opacity="0.6" />
+  <path d="M 120 152 C 130 160, 145 162, 155 158 C 145 170, 130 172, 120 170 Z" fill="#83B88C" opacity="0.95" />
+</svg>
+"""
+
+# -----------------------------------------------------------------------------
+# ESTILOS CSS MARINOS Y ANIMACIONES (PALETA AQUA NATURA)
+# #123047 (Azul profundo) | #087E8B (Azul río) | #38B6C5 (Turquesa agua)
+# #25866C (Verde bosque) | #83B88C (Verde natural) | #F4F9F8 (Blanco niebla)
 # -----------------------------------------------------------------------------
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
     
     html, body, [class*="css"] {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        color: #1e293b;
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: #123047;
     }
     
     .stApp {
-        background-color: #F7F9FC;
+        background-color: #F4F9F8;
+        background-image: radial-gradient(circle at 10% 20%, rgba(56, 182, 197, 0.05) 0%, transparent 40%),
+                          radial-gradient(circle at 90% 80%, rgba(8, 126, 139, 0.04) 0%, transparent 45%);
     }
 
-    /* Encabezado Principal */
-    .brand-header {
-        background: #123047;
-        border-radius: 12px;
-        padding: 1.5rem 2rem;
+    /* Animaciones Marinas Fluidas */
+    @keyframes floatDroplet {
+        0% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-6px) rotate(1.5deg); }
+        100% { transform: translateY(0px) rotate(0deg); }
+    }
+    @keyframes waveMove {
+        0% { transform: translateX(0); }
+        50% { transform: translateX(-25%); }
+        100% { transform: translateX(-50%); }
+    }
+    @keyframes waveBack {
+        0% { transform: translateX(-50%); }
+        50% { transform: translateX(-25%); }
+        100% { transform: translateX(0); }
+    }
+    @keyframes pulseGlow {
+        0% { box-shadow: 0 4px 20px -2px rgba(56, 182, 197, 0.2); }
+        50% { box-shadow: 0 8px 30px 2px rgba(56, 182, 197, 0.4); }
+        100% { box-shadow: 0 4px 20px -2px rgba(56, 182, 197, 0.2); }
+    }
+
+    /* Banner Oceánico Hero */
+    .ocean-hero {
+        position: relative;
+        background: linear-gradient(135deg, #123047 0%, #087E8B 65%, #25866C 100%);
+        border-radius: 16px;
+        padding: 2.2rem 2.4rem 4.8rem 2.4rem;
         color: #FFFFFF;
         margin-bottom: 1.5rem;
-        border-left: 6px solid #149D9A;
-        box-shadow: 0 4px 6px -1px rgba(18, 48, 71, 0.1);
+        overflow: hidden;
+        box-shadow: 0 10px 30px -5px rgba(8, 126, 139, 0.35);
+        border: 1px solid rgba(56, 182, 197, 0.25);
+    }
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+    .logo-box {
+        width: 82px;
+        height: 82px;
+        flex-shrink: 0;
+        animation: floatDroplet 4.5s ease-in-out infinite;
+        filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.25));
     }
     .brand-title {
-        font-size: 1.85rem;
-        font-weight: 700;
-        letter-spacing: -0.02em;
+        font-size: 2.2rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
         margin: 0;
         color: #FFFFFF;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
-    .brand-subtitle {
-        font-size: 0.95rem;
-        color: #CBD5E1;
+    .brand-tagline {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #38B6C5;
+        margin-top: 0.25rem;
+        letter-spacing: 0.02em;
+    }
+    .brand-desc {
+        font-size: 0.9rem;
+        color: #E2E8F0;
         margin-top: 0.35rem;
-        margin-bottom: 0.5rem;
-        font-weight: 400;
+        max-width: 880px;
+        line-height: 1.4;
     }
-    .brand-badges {
+    .brand-pills {
         display: flex;
         gap: 0.5rem;
         flex-wrap: wrap;
-        margin-top: 0.5rem;
+        margin-top: 0.75rem;
     }
-    .brand-badge {
+    .marine-pill {
         background: rgba(255, 255, 255, 0.12);
-        padding: 0.2rem 0.65rem;
-        border-radius: 6px;
-        font-size: 0.75rem;
+        backdrop-filter: blur(8px);
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.78rem;
         font-weight: 600;
-        color: #E2E8F0;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #F4F9F8;
+        border: 1px solid rgba(56, 182, 197, 0.4);
     }
 
-    /* Tarjetas de Contenido */
+    /* Olas Marinas Animadas SVG en el fondo del hero */
+    .ocean-waves {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        overflow: hidden;
+        line-height: 0;
+        z-index: 1;
+    }
+
+    /* Tarjetas de Módulo y Contenedores */
     .clean-card {
         background: #FFFFFF;
-        border: 1px solid #E2E8F0;
-        border-radius: 10px;
-        padding: 1.25rem;
-        margin-bottom: 1rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+        border: 1px solid #CBD5E1;
+        border-radius: 12px;
+        padding: 1.3rem;
+        margin-bottom: 1.1rem;
+        box-shadow: 0 2px 5px rgba(8, 126, 139, 0.04);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .clean-card:hover {
+        box-shadow: 0 8px 18px -2px rgba(8, 126, 139, 0.1);
     }
     .card-title {
-        font-size: 1.05rem;
+        font-size: 1.1rem;
         font-weight: 700;
         color: #123047;
         margin-bottom: 0.8rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        border-bottom: 1px solid #F1F5F9;
-        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #E2E8F0;
+        padding-bottom: 0.4rem;
     }
 
-    /* Tarjetas Métricas KPI */
+    /* Tarjetas Métricas KPI con Efecto de Inmersión */
     .kpi-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 0.85rem;
+        gap: 0.9rem;
         margin-bottom: 1.2rem;
     }
     .kpi-card {
         background: #FFFFFF;
-        border: 1px solid #E2E8F0;
-        border-radius: 8px;
-        padding: 1rem;
-        border-top: 3.5px solid #149D9A;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        border: 1px solid #CBD5E1;
+        border-radius: 10px;
+        padding: 1.1rem;
+        border-top: 4px solid #087E8B;
+        box-shadow: 0 2px 4px rgba(8, 126, 139, 0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-top-color 0.2s ease;
+    }
+    .kpi-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px -3px rgba(8, 126, 139, 0.15);
+        border-top-color: #38B6C5;
     }
     .kpi-label {
-        font-size: 0.78rem;
-        font-weight: 600;
+        font-size: 0.76rem;
+        font-weight: 700;
         color: #64748B;
         text-transform: uppercase;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.05em;
     }
     .kpi-val {
-        font-size: 1.6rem;
-        font-weight: 700;
+        font-size: 1.65rem;
+        font-weight: 800;
         color: #123047;
         line-height: 1.2;
         margin-top: 0.2rem;
     }
     .kpi-sub {
         font-size: 0.82rem;
-        color: #475569;
+        color: #087E8B;
         margin-top: 0.25rem;
         font-family: 'JetBrains Mono', monospace;
+        font-weight: 500;
     }
 
-    /* Badges Técnicos */
+    /* Badges de Estado Aqua Natura */
     .tag-conforme {
         background: #DCFCE7;
-        color: #15803D;
-        padding: 0.2rem 0.5rem;
-        border-radius: 4px;
-        font-size: 0.75rem;
-        font-weight: 600;
+        color: #25866C;
+        padding: 0.25rem 0.55rem;
+        border-radius: 6px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        border: 1px solid #83B88C;
     }
     .tag-alerta {
         background: #FEF3C7;
         color: #B45309;
-        padding: 0.2rem 0.5rem;
-        border-radius: 4px;
-        font-size: 0.75rem;
-        font-weight: 600;
+        padding: 0.25rem 0.55rem;
+        border-radius: 6px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        border: 1px solid #FDE68A;
     }
     .tag-error {
         background: #FEE2E2;
         color: #B91C1C;
-        padding: 0.2rem 0.5rem;
-        border-radius: 4px;
-        font-size: 0.75rem;
-        font-weight: 600;
+        padding: 0.25rem 0.55rem;
+        border-radius: 6px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        border: 1px solid #FECACA;
+    }
+
+    /* Botones primarios en Azul Río */
+    button[kind="primary"] {
+        background-color: #087E8B !important;
+        border-color: #087E8B !important;
+        color: #FFFFFF !important;
+        font-weight: 600 !important;
+        border-radius: 8px !important;
+        transition: all 0.2s ease !important;
+    }
+    button[kind="primary"]:hover {
+        background-color: #38B6C5 !important;
+        border-color: #38B6C5 !important;
+        box-shadow: 0 4px 12px rgba(56, 182, 197, 0.35) !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
 
 # -----------------------------------------------------------------------------
-# SIDEBAR: CONFIGURACIÓN GENERAL Y CONTROL DE ESCENARIOS
+# SIDEBAR MARINO CON LOGO AQUAMARIS
 # -----------------------------------------------------------------------------
 with st.sidebar:
-    st.markdown("### Configuración del Proyecto")
-    
-    # 1. Selector de Modo Normativo vs Exploratorio
+    # Logo e identidad en barra lateral
+    st.markdown(f"""
+    <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:1rem; padding-bottom:0.8rem; border-bottom:1px solid #E2E8F0;">
+        <div style="width:48px; height:48px; flex-shrink:0;">
+            {AQUAMARIS_LOGO_SVG}
+        </div>
+        <div>
+            <div style="font-size:1.25rem; font-weight:800; color:#123047; letter-spacing:-0.02em;">AQUAMARIS</div>
+            <div style="font-size:0.75rem; color:#087E8B; font-weight:600;">HIDRO-INGENIERÍA</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("### Configuración del Sistema")
+
     mode_selection = st.radio(
         "Marco de Evaluación:",
         options=["Normativa RAS (Res. 0330 / 2017)", "Modo Exploratorio / Libre"],
@@ -201,7 +340,6 @@ with st.sidebar:
     is_ras_mode = (mode_selection == "Normativa RAS (Res. 0330 / 2017)")
     calc_mode = CalculationMode.NORMATIVE_RAS if is_ras_mode else CalculationMode.EXPLORATORY
 
-    # 2. Piso Térmico / Altitud (si aplica RAS)
     if is_ras_mode:
         alt_label = st.selectbox(
             "Piso Térmico / Altitud (Art. 43):",
@@ -227,10 +365,9 @@ with st.sidebar:
         ras_max_dot = 350.0
 
     st.markdown("---")
-    
-    # 3. Escenarios Predefinidos
+
     scenario_choice = st.selectbox(
-        "Cargar Escenario de Prueba:",
+        "Cargar Escenario Oceánico / Modelo:",
         options=[
             "Personalizado",
             "Municipio Intermedio (45,000 hab + Agroindustria)",
@@ -241,8 +378,7 @@ with st.sidebar:
     )
 
     st.markdown("---")
-    
-    # 4. Ajustes Avanzados de Factores de Pico
+
     with st.expander("Factores de Consumo Máximo (k₁, k₂)", expanded=False):
         st.caption("Diferencian la Demanda Media Diaria de los Caudales de Dimensionamiento:")
         
@@ -254,12 +390,12 @@ with st.sidebar:
         else:
             k1_input = 1.20
             k2_input = 1.50
-            st.info("Valores sugeridos por RAS 0330 según tamaño de población.")
+            st.info("Valores sugeridos por RAS 0330 según tamaño poblacional.")
 
         apply_k_to_ind = st.checkbox(
             "Mayorar demanda industrial con k₁ y k₂",
             value=False,
-            help="En saneamiento estándar, las industrias con reservorio o régimen continuo no se afectan con picos residenciales."
+            help="En saneamiento estándar, las industrias con reservorio propio o régimen continuo no se afectan con picos residenciales."
         )
 
 
@@ -289,27 +425,47 @@ else:
         {"Nombre": "Industria Agroalimentaria", "Método": "Directo", "Unidades/día": 0.0, "Consumo esp.": 300.0, "Unidad": "m3/día", "Horas op.": 16.0, "Reserva propia": True, "Fuente": "Estimación directa del proyectista."},
     ]
 
-# Inicializar sesión de industrias de forma unificada
 if "df_industries" not in st.session_state or st.session_state.get("last_scenario_loaded") != scenario_choice:
     st.session_state["df_industries"] = pd.DataFrame(initial_ind_records)
     st.session_state["last_scenario_loaded"] = scenario_choice
 
 
 # -----------------------------------------------------------------------------
-# ENCABEZADO CORPORATIVO
+# HERO BANNER PRINCIPAL CON OLAS MARINAS ANIMADAS Y LOGO AQUAMARIS
 # -----------------------------------------------------------------------------
 st.markdown(f"""
-<div class="brand-header">
-    <div class="brand-title">Calculadora de Demanda Doméstica e Industrial de Agua</div>
-    <div class="brand-subtitle">
-        Plataforma técnica para dimensionamiento hidráulico, estimación de Demanda Media Diaria (Qmd),
-        caudales de pico (QMD, QMH) y auditoría técnica bajo normativa colombiana RAS 0330 de 2017 y estándares internacionales.
+<div class="ocean-hero">
+    <div class="hero-content">
+        <div class="logo-box">
+            {AQUAMARIS_LOGO_SVG}
+        </div>
+        <div>
+            <div class="brand-title">AQUAMARIS</div>
+            <div class="brand-tagline">PLATAFORMA DE INGENIERÍA HÍDRICA & DEMANDA DE AGUA</div>
+            <div class="brand-desc">
+                Herramienta avanzada para dimensionamiento hidráulico, estimación de Demanda Media Diaria (Qmd),
+                caudales de pico (QMD, QMH) y auditoría técnica bajo el RAS (Resolución 0330 de 2017) y estándares internacionales.
+            </div>
+            <div class="brand-pills">
+                <span class="marine-pill">🌊 Paleta: Aqua Natura</span>
+                <span class="marine-pill">⚖️ Marco: {'RAS 0330 (Colombia)' if is_ras_mode else 'Modo Exploratorio'}</span>
+                <span class="marine-pill">💧 Continuidad: 1 L/s = 86.40 m³/día</span>
+                <span class="marine-pill">🔍 Auditoría Casilla por Casilla</span>
+                <span class="marine-pill">📊 Exportación Excel 5 Hojas & PDF</span>
+            </div>
+        </div>
     </div>
-    <div class="brand-badges">
-        <span class="brand-badge">Modo: {'RAS 0330 (Colombia)' if is_ras_mode else 'Exploratorio / Libre'}</span>
-        <span class="brand-badge">Equivalencia Exacta: 1 L/s = 86.40 m³/día</span>
-        <span class="brand-badge">Auditoría Casilla por Casilla</span>
-        <span class="brand-badge">Exportación Excel Abierta (.xlsx)</span>
+    <div class="ocean-waves">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 24 150 28" preserveAspectRatio="none" style="width:100%; height:55px;">
+            <defs>
+                <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+            </defs>
+            <g>
+                <use href="#gentle-wave" x="48" y="0" fill="rgba(56, 182, 197, 0.45)" style="animation: waveMove 12s cubic-bezier(.55,.5,.45,.5) infinite;" />
+                <use href="#gentle-wave" x="48" y="3" fill="rgba(37, 134, 108, 0.55)" style="animation: waveBack 8s cubic-bezier(.55,.5,.45,.5) infinite;" />
+                <use href="#gentle-wave" x="48" y="6" fill="#F4F9F8" style="animation: waveMove 5s cubic-bezier(.55,.5,.45,.5) infinite;" />
+            </g>
+        </svg>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -368,29 +524,27 @@ with tab_domestica:
             help="Agua no contabilizada (ANC) debida a fugas en red. Máximo RAS Art. 44: 25.0%."
         )
 
-    # Cálculo preliminar de dotación bruta
     factor_p = 1.0 - (perdidas_pct / 100.0)
     dotacion_bruta_prelim = dotacion_neta / factor_p if factor_p > 0 else 0.0
 
     st.markdown("---")
     
-    # Resumen rápido de dotación en tarjeta limpia
     st.markdown(f"""
-    <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:0.9rem 1.2rem; display:flex; gap:2rem; flex-wrap:wrap; align-items:center;">
+    <div style="background:#FFFFFF; border:1px solid #CBD5E1; border-radius:10px; padding:1rem 1.4rem; display:flex; gap:2.5rem; flex-wrap:wrap; align-items:center; box-shadow: 0 2px 4px rgba(8, 126, 139, 0.04);">
         <div>
-            <span style="font-size:0.8rem; color:#64748B; font-weight:600;">DOTACIÓN NETA:</span><br/>
-            <span style="font-size:1.15rem; font-weight:700; color:#123047;">{dotacion_neta:.1f} L/hab·día</span>
+            <span style="font-size:0.75rem; color:#64748B; font-weight:700; text-transform:uppercase;">DOTACIÓN NETA:</span><br/>
+            <span style="font-size:1.25rem; font-weight:800; color:#123047;">{dotacion_neta:.1f} <span style="font-size:0.85rem; font-weight:500;">L/hab·d</span></span>
         </div>
         <div>
-            <span style="font-size:0.8rem; color:#64748B; font-weight:600;">PÉRDIDAS EN RED:</span><br/>
-            <span style="font-size:1.15rem; font-weight:700; color:#149D9A;">{perdidas_pct:.1f}%</span>
+            <span style="font-size:0.75rem; color:#64748B; font-weight:700; text-transform:uppercase;">PÉRDIDAS EN RED:</span><br/>
+            <span style="font-size:1.25rem; font-weight:800; color:#087E8B;">{perdidas_pct:.1f}%</span>
         </div>
         <div>
-            <span style="font-size:0.8rem; color:#64748B; font-weight:600;">DOTACIÓN BRUTA CALCULADA:</span><br/>
-            <span style="font-size:1.15rem; font-weight:700; color:#0284C7;">{dotacion_bruta_prelim:.2f} L/hab·día</span>
+            <span style="font-size:0.75rem; color:#64748B; font-weight:700; text-transform:uppercase;">DOTACIÓN BRUTA CALCULADA:</span><br/>
+            <span style="font-size:1.25rem; font-weight:800; color:#25866C;">{dotacion_bruta_prelim:.2f} <span style="font-size:0.85rem; font-weight:500;">L/hab·d</span></span>
         </div>
         <div>
-            <span style="font-size:0.8rem; color:#64748B; font-weight:600;">ESTADO NORMATIVO:</span><br/>
+            <span style="font-size:0.75rem; color:#64748B; font-weight:700; text-transform:uppercase;">ESTADO TÉCNICO:</span><br/>
             <span class="tag-conforme">CONFORME RAS 0330</span>
         </div>
     </div>
@@ -402,7 +556,7 @@ with tab_domestica:
           - Altura $> 2.000\text{ msnm}$ (Clima Frío): Máximo **120 L/hab·día**.
           - Altura $1.000 - 2.000\text{ msnm}$ (Clima Templado): Máximo **130 L/hab·día**.
           - Altura $< 1.000\text{ msnm}$ (Clima Cálido): Máximo **140 L/hab·día**.
-        - **Artículo 44 (Pérdidas Técnicas):**
+        - **Artículo 44 (Pérdidas Técnicas en Red):**
           - No deben superar el **25.0%** en redes de distribución de agua potable.
         - **Fórmula de Dotación Bruta:**
           $$D_{bruta} = \frac{D_{neta}}{1 - \frac{\%P}{100}} \quad [L/\text{hab}\cdot\text{día}]$$
@@ -416,7 +570,6 @@ with tab_industrial:
     st.markdown('<div class="card-title">Inventario y Modelación de Demanda Industrial</div>', unsafe_allow_html=True)
     st.caption("Edita directamente las celdas de la tabla para modificar consumos o agregar nuevas industrias. La tabla está 100% unificada con el motor de cálculo.")
 
-    # Tabla editable de industrias usando st.data_editor nativo
     edited_df = st.data_editor(
         st.session_state["df_industries"],
         num_rows="dynamic",
@@ -434,7 +587,6 @@ with tab_industrial:
         key="editor_industrias"
     )
 
-    # Actualizar estado de sesión
     st.session_state["df_industries"] = edited_df
 
     col_btn_i1, col_btn_i2 = st.columns([1, 4])
@@ -458,7 +610,6 @@ with tab_industrial:
 # =============================================================================
 # CONVERSIÓN DE DATOS Y EJECUCIÓN DEL MOTOR HIDRÁULICO
 # =============================================================================
-# Construir registros industriales a partir de la tabla editable
 industrial_objs: List[IndustrialRecord] = []
 for _, row in edited_df.iterrows():
     r_name = str(row.get("Nombre", "Industria")).strip()
@@ -494,13 +645,11 @@ for _, row in edited_df.iterrows():
         )
     industrial_objs.append(rec)
 
-# Ajuste automático de coeficientes k1 y k2 si no son personalizados
 if not custom_peaks:
     k1_val, k2_val = WaterDemandEngine.suggest_ras_peak_factors(poblacion)
 else:
     k1_val, k2_val = k1_input, k2_input
 
-# Instanciar entrada doméstica
 dom_input = DomesticDemandInput(
     population=poblacion,
     endowment_L_hab_day=dotacion_neta,
@@ -509,7 +658,6 @@ dom_input = DomesticDemandInput(
     altitude_zone=selected_zone
 )
 
-# Ejecución controlada del motor hidráulico
 calc_error = None
 try:
     results: WaterDemandResults = WaterDemandEngine.calculate_total_system_demand(
@@ -533,43 +681,41 @@ with tab_resultados:
     else:
         st.markdown('<div class="card-title">Cuadro de Mando de Caudales de Diseño</div>', unsafe_allow_html=True)
 
-        # KPIs Principales
         st.markdown(f"""
         <div class="kpi-grid">
-            <div class="kpi-card" style="border-top-color: #0284C7;">
+            <div class="kpi-card" style="border-top-color: #087E8B;">
                 <div class="kpi-label">Demanda Doméstica (Qmd_dom)</div>
-                <div class="kpi-val">{results.domestic_flow_L_s:.2f} <span style="font-size:0.9rem; font-weight:500;">L/s</span></div>
+                <div class="kpi-val">{results.domestic_flow_L_s:.2f} <span style="font-size:0.85rem; font-weight:500;">L/s</span></div>
                 <div class="kpi-sub">{results.domestic_volume_m3_day:,.1f} m³/día</div>
-                <div style="font-size:0.75rem; color:#64748B; margin-top:0.2rem;">Dotación Bruta: {results.domestic_endowment_gross:.1f} L/hab·d</div>
+                <div style="font-size:0.75rem; color:#64748B; margin-top:0.25rem;">Dotación Bruta: {results.domestic_endowment_gross:.1f} L/hab·d</div>
             </div>
-            <div class="kpi-card" style="border-top-color: #149D9A;">
+            <div class="kpi-card" style="border-top-color: #38B6C5;">
                 <div class="kpi-label">Demanda Industrial (Qmd_ind)</div>
-                <div class="kpi-val">{results.industrial_flow_L_s:.2f} <span style="font-size:0.9rem; font-weight:500;">L/s</span></div>
+                <div class="kpi-val">{results.industrial_flow_L_s:.2f} <span style="font-size:0.85rem; font-weight:500;">L/s</span></div>
                 <div class="kpi-sub">{results.industrial_volume_m3_day:,.1f} m³/día</div>
-                <div style="font-size:0.75rem; color:#64748B; margin-top:0.2rem;">{len(results.industrial_details)} proceso(s) modelados</div>
+                <div style="font-size:0.75rem; color:#64748B; margin-top:0.25rem;">{len(results.industrial_details)} proceso(s) modelados</div>
             </div>
             <div class="kpi-card" style="border-top-color: #123047; background:#F8FAFC;">
                 <div class="kpi-label" style="color:#123047;">Demanda Media Total (Qmd)</div>
-                <div class="kpi-val" style="color:#123047;">{results.total_flow_L_s:.2f} <span style="font-size:0.9rem; font-weight:500;">L/s</span></div>
-                <div class="kpi-sub">{results.total_volume_m3_day:,.1f} m³/día</div>
-                <div style="font-size:0.75rem; color:#123047; font-weight:600; margin-top:0.2rem;">Base Concesiones y Balances</div>
+                <div class="kpi-val" style="color:#123047;">{results.total_flow_L_s:.2f} <span style="font-size:0.85rem; font-weight:500;">L/s</span></div>
+                <div class="kpi-sub" style="color:#123047;">{results.total_volume_m3_day:,.1f} m³/día</div>
+                <div style="font-size:0.75rem; color:#087E8B; font-weight:700; margin-top:0.25rem;">Base Concesiones y Balances</div>
             </div>
-            <div class="kpi-card" style="border-top-color: #D97706; background:#FFFBEB;">
-                <div class="kpi-label" style="color:#B45309;">Máximo Diario (QMD)</div>
-                <div class="kpi-val" style="color:#B45309;">{results.q_max_daily_flow_L_s:.2f} <span style="font-size:0.9rem; font-weight:500;">L/s</span></div>
-                <div class="kpi-sub">{results.q_max_daily_volume_m3_day:,.1f} m³/día</div>
-                <div style="font-size:0.75rem; color:#92400E; margin-top:0.2rem;">k₁ = {results.k1_coefficient:.2f} | Captación, Aducción, PTAP</div>
+            <div class="kpi-card" style="border-top-color: #25866C; background:#F0FDF4;">
+                <div class="kpi-label" style="color:#25866C;">Máximo Diario (QMD)</div>
+                <div class="kpi-val" style="color:#25866C;">{results.q_max_daily_flow_L_s:.2f} <span style="font-size:0.85rem; font-weight:500;">L/s</span></div>
+                <div class="kpi-sub" style="color:#166534;">{results.q_max_daily_volume_m3_day:,.1f} m³/día</div>
+                <div style="font-size:0.75rem; color:#15803D; margin-top:0.25rem;">k₁ = {results.k1_coefficient:.2f} | Captación, Aducción, PTAP</div>
             </div>
-            <div class="kpi-card" style="border-top-color: #DC2626; background:#FEF2F2;">
-                <div class="kpi-label" style="color:#B91C1C;">Máximo Horario (QMH)</div>
-                <div class="kpi-val" style="color:#B91C1C;">{results.q_max_hourly_flow_L_s:.2f} <span style="font-size:0.9rem; font-weight:500;">L/s</span></div>
-                <div class="kpi-sub">{results.q_max_hourly_volume_m3_day:,.1f} m³/día</div>
-                <div style="font-size:0.75rem; color:#991B1B; margin-top:0.2rem;">k₂ = {results.k2_coefficient:.2f} | Red de Distribución</div>
+            <div class="kpi-card" style="border-top-color: #0E7490; background:#ECFEFF;">
+                <div class="kpi-label" style="color:#0E7490;">Máximo Horario (QMH)</div>
+                <div class="kpi-val" style="color:#0E7490;">{results.q_max_hourly_flow_L_s:.2f} <span style="font-size:0.85rem; font-weight:500;">L/s</span></div>
+                <div class="kpi-sub" style="color:#155E75;">{results.q_max_hourly_volume_m3_day:,.1f} m³/día</div>
+                <div style="font-size:0.75rem; color:#0E7490; margin-top:0.25rem;">k₂ = {results.k2_coefficient:.2f} | Red de Distribución</div>
             </div>
         </div>
         """, unsafe_allow_html=True)
 
-        # Gráficas Comparativas
         col_chart1, col_chart2 = st.columns([1.2, 1], gap="medium")
 
         with col_chart1:
@@ -577,17 +723,17 @@ with tab_resultados:
             fig_bars.add_trace(go.Bar(
                 x=["Doméstico (Qmd)", "Industrial (Qmd)", "Medio Total (Qmd)", "Máx. Diario (QMD)", "Máx. Horario (QMH)"],
                 y=[results.domestic_flow_L_s, results.industrial_flow_L_s, results.total_flow_L_s, results.q_max_daily_flow_L_s, results.q_max_hourly_flow_L_s],
-                marker_color=["#0284C7", "#149D9A", "#123047", "#D97706", "#DC2626"],
+                marker_color=["#087E8B", "#38B6C5", "#123047", "#25866C", "#0E7490"],
                 text=[f"{results.domestic_flow_L_s:.2f} L/s", f"{results.industrial_flow_L_s:.2f} L/s", f"{results.total_flow_L_s:.2f} L/s", f"{results.q_max_daily_flow_L_s:.2f} L/s", f"{results.q_max_hourly_flow_L_s:.2f} L/s"],
                 textposition="outside"
             ))
             fig_bars.update_layout(
-                title=dict(text="Comparativa de Caudales de Diseño (L/s)", font=dict(size=13, color="#123047")),
+                title=dict(text="Comparativa de Caudales del Sistema (L/s)", font=dict(size=13, color="#123047", family="Plus Jakarta Sans")),
                 height=300,
                 margin=dict(l=20, r=20, t=35, b=20),
-                yaxis=dict(title="Caudal (L/s)", gridcolor="#F1F5F9"),
+                yaxis=dict(title="Caudal (L/s)", gridcolor="#E2E8F0"),
                 plot_bgcolor="rgba(0,0,0,0)",
-                font=dict(family="Inter, sans-serif")
+                font=dict(family="Plus Jakarta Sans, sans-serif")
             )
             st.plotly_chart(fig_bars, use_container_width=True)
 
@@ -596,24 +742,23 @@ with tab_resultados:
                 fig_donut = go.Figure(data=[go.Pie(
                     labels=["Doméstico", "Industrial"],
                     values=[results.domestic_volume_m3_day, results.industrial_volume_m3_day],
-                    hole=0.6,
-                    marker_colors=["#0284C7", "#149D9A"],
+                    hole=0.62,
+                    marker_colors=["#087E8B", "#38B6C5"],
                     textinfo="label+percent",
                     texttemplate="<b>%{label}</b><br>%{percent} (%{value:,.0f} m³/d)",
                     hoverinfo="label+value+percent",
                 )])
                 fig_donut.update_layout(
-                    title=dict(text="Distribución de la Demanda Diaria", font=dict(size=13, color="#123047")),
+                    title=dict(text="Distribución de la Demanda Diaria", font=dict(size=13, color="#123047", family="Plus Jakarta Sans")),
                     showlegend=False,
                     height=300,
                     margin=dict(l=10, r=10, t=35, b=10),
-                    font=dict(family="Inter, sans-serif")
+                    font=dict(family="Plus Jakarta Sans, sans-serif")
                 )
                 st.plotly_chart(fig_donut, use_container_width=True)
 
         st.markdown("---")
         
-        # Matriz de Auditoría Casilla por Casilla
         st.markdown('<div class="card-title">Matriz de Auditoría Casilla por Casilla</div>', unsafe_allow_html=True)
         st.caption("Verificación de consistencia dimensional, límites normativos y trazabilidad técnica.")
 
@@ -628,12 +773,11 @@ with tab_resultados:
 with tab_exportacion:
     st.markdown('<div class="card-title">Generación de Memorias y Documentos Técnicos</div>', unsafe_allow_html=True)
     st.markdown("""
-    Descarga la memoria completa de cálculo estructurada conforme a estándares de consultoría hidráulica.
-    La memoria en Excel incluye 5 hojas técnicas con fórmulas comprobables en celdas, formatos numéricos reales y auditoría de concordancia.
+    Descarga la memoria completa de cálculo estructurada conforme a estándares de consultoría hidráulica y la identidad **AQUAMARIS**.
+    La memoria en Excel incluye 5 hojas técnicas con fórmulas comprobables en celdas, valores numéricos reales y auditoría de concordancia `Python vs Excel`.
     """)
 
     if results and not calc_error:
-        # Generar libros en memoria
         excel_bytes = generate_professional_excel(results)
         pdf_bytes = generate_professional_pdf(results)
 
@@ -641,12 +785,12 @@ with tab_exportacion:
 
         with col_ex_main:
             st.markdown("""
-            <div style="background:#FFFFFF; border:2px solid #149D9A; border-radius:10px; padding:1.25rem;">
+            <div style="background:#FFFFFF; border:2px solid #087E8B; border-radius:12px; padding:1.25rem; box-shadow:0 4px 6px -1px rgba(8, 126, 139, 0.08);">
                 <h4 style="color:#123047; margin-top:0;">📊 Libro Completo en Excel (.xlsx)</h4>
                 <p style="font-size:0.85rem; color:#475569;">
-                    Incluye 5 hojas técnicas formalizadas con fórmulas comprobables en celda:
+                    Incluye 5 hojas técnicas formalizadas con fórmulas comprobables en celda y paleta Aqua Natura:
                 </p>
-                <ul style="font-size:0.8rem; color:#334155; padding-left:1.2rem;">
+                <ul style="font-size:0.8rem; color:#123047; padding-left:1.2rem;">
                     <li><b>01_Resumen:</b> Cuadro ejecutivo y gráfico de caudales.</li>
                     <li><b>02_Datos_Entrada:</b> Parámetros del proyecto y marco normativo.</li>
                     <li><b>03_Memoria_Calculo:</b> Fórmulas auditables enlazadas a celdas.</li>
@@ -659,19 +803,19 @@ with tab_exportacion:
             st.download_button(
                 label="📥 Descargar Memoria en Excel (.xlsx)",
                 data=excel_bytes.getvalue(),
-                file_name=f"Memoria_Demanda_Agua_{datetime.now().strftime('%Y%m%d')}.xlsx",
+                file_name=f"AQUAMARIS_Demanda_Agua_{datetime.now().strftime('%Y%m%d')}.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 use_container_width=True
             )
 
         with col_ex_pdf:
             st.markdown("""
-            <div style="background:#FFFFFF; border:1px solid #CBD5E1; border-radius:10px; padding:1.25rem;">
+            <div style="background:#FFFFFF; border:1px solid #CBD5E1; border-radius:12px; padding:1.25rem; box-shadow:0 2px 4px rgba(8, 126, 139, 0.05);">
                 <h4 style="color:#123047; margin-top:0;">📄 Informe Técnico en PDF (.pdf)</h4>
                 <p style="font-size:0.85rem; color:#475569;">
-                    Documento formal maquetado listo para adjuntar a memorias de consultoría, expedientes técnicos o trámites de concesión:
+                    Documento formal maquetado con la identidad AQUAMARIS listo para adjuntar a expedientes técnicos:
                 </p>
-                <ul style="font-size:0.8rem; color:#334155; padding-left:1.2rem;">
+                <ul style="font-size:0.8rem; color:#123047; padding-left:1.2rem;">
                     <li>Tablas de caudales medios y máximos consolidados.</li>
                     <li>Control de cumplimiento de Artículos 43 y 44 Res. 0330.</li>
                     <li>Desglose de usuarios industriales y caudales en turno.</li>
@@ -683,9 +827,9 @@ with tab_exportacion:
             st.download_button(
                 label="📥 Descargar Informe Técnico en PDF (.pdf)",
                 data=pdf_bytes.getvalue(),
-                file_name=f"Informe_Demanda_Agua_{datetime.now().strftime('%Y%m%d')}.pdf",
+                file_name=f"AQUAMARIS_Informe_Demanda_{datetime.now().strftime('%Y%m%d')}.pdf",
                 mime="application/pdf",
                 use_container_width=True
             )
     else:
-        st.warning("No es posible generar los archivos de exportación hasta que se corrijan las incoherencias detectadas.")
+        st.warning("No es posible generar los archivos de exportación hasta que se corrijan las inconsistencias detectadas.")

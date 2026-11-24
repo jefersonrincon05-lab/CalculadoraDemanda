@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="100%" height="100%">
+  <defs>
+    <!-- Gradiente exterior del escudo marino -->
+    <linearGradient id="oceanShield" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#123047" />
+      <stop offset="60%" stop-color="#087E8B" />
+      <stop offset="100%" stop-color="#25866C" />
+    </linearGradient>
+
+    <!-- Gradiente de la gran ola turquesa -->
+    <linearGradient id="waveTurquoise" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#087E8B" />
+      <stop offset="50%" stop-color="#38B6C5" />
+      <stop offset="100%" stop-color="#83B88C" />
+    </linearGradient>
+
+    <!-- Gradiente de la gota central viva -->
+    <linearGradient id="dropletGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#38B6C5" />
+      <stop offset="100%" stop-color="#087E8B" />
+    </linearGradient>
+
+    <!-- Filtro de resplandor acuático suave -->
+    <filter id="aquaGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Círculo base con borde de agua -->
+  <circle cx="120" cy="120" r="108" fill="url(#oceanShield)" stroke="#38B6C5" stroke-width="4" stroke-opacity="0.8" />
+  
+  <!-- Anillo concéntrico sutil de navegación y precisión -->
+  <circle cx="120" cy="120" r="98" fill="none" stroke="#F4F9F8" stroke-width="1.5" stroke-dasharray="6,4" stroke-opacity="0.4" />
+
+  <!-- Gran ola oceánica envolvente -->
+  <path d="M 38 135 C 55 105, 95 80, 140 100 C 175 116, 195 95, 202 85 C 195 140, 160 195, 120 198 C 80 200, 48 170, 38 135 Z" 
+        fill="url(#waveTurquoise)" opacity="0.9" />
+
+  <!-- Segunda ola interna dinámica -->
+  <path d="M 45 145 C 70 125, 110 115, 145 130 C 170 142, 185 130, 192 120 C 182 165, 150 190, 120 190 C 85 190, 58 170, 45 145 Z" 
+        fill="#123047" opacity="0.65" />
+
+  <!-- Gota de agua cristalina central en suspensión -->
+  <path d="M 120 52 C 120 52, 90 94, 90 120 C 90 136.5, 103.5 150, 120 150 C 136.5 150, 150 136.5, 150 120 C 150 94, 120 52, 120 52 Z" 
+        fill="url(#dropletGrad)" filter="url(#aquaGlow)" stroke="#F4F9F8" stroke-width="2.5" />
+
+  <!-- Brillo especular blanco en la gota -->
+  <ellipse cx="110" cy="110" rx="9" ry="14" transform="rotate(-30 110 110)" fill="#F4F9F8" opacity="0.75" />
+  <circle cx="132" cy="130" r="3.5" fill="#F4F9F8" opacity="0.6" />
+
+  <!-- Detalle ecológico: hoja / aleta estilizada en la base -->
+  <path d="M 120 152 C 130 160, 145 162, 155 158 C 145 170, 130 172, 120 170 Z" 
+        fill="#83B88C" opacity="0.9" />
+</svg>

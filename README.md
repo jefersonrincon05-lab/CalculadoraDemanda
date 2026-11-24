@@ -1,13 +1,33 @@
-# 💧 Calculadora de Demanda Doméstica e Industrial de Agua (v3.0)
+# 🌊 AQUAMARIS — Plataforma de Ingeniería Hídrica & Demanda de Agua
 
-Plataforma técnica, profesional y auditable de **Ingeniería Sanitaria e Hidráulica**, desarrollada en **Python** y **Streamlit** para dimensionamiento de sistemas de abastecimiento de agua potable, balances hídricos y estimación de caudales de diseño.
+![AQUAMARIS Logo](assets/logo.svg)
 
-Implementa el marco normativo colombiano **RAS (Resolución 0330 de 2017 del Ministerio de Vivienda, Ciudad y Territorio)**, así como un **Modo Exploratorio / Libre** para proyectos internacionales y análisis de sensibilidad técnica.
+Plataforma profesional, técnica y auditable de **Ingeniería Sanitaria e Hidráulica**, desarrollada en **Python** y **Streamlit** para el cálculo riguroso de la demanda de agua potable (doméstica e industrial), balances hídricos y dimensionamiento de obras civiles de acueducto.
+
+Implementa de forma estricta el marco normativo colombiano **RAS (Resolución 0330 de 2017 del Ministerio de Vivienda, Ciudad y Territorio)** y ofrece un **Modo Exploratorio / Libre** para proyectos de investigación y análisis de sensibilidad técnica.
+
+- 🌐 **Acceso Público en la Nube:** [https://calculadorademanda-n4xhr79pr8bmbfrykfey8k.streamlit.app/](https://calculadorademanda-n4xhr79pr8bmbfrykfey8k.streamlit.app/)
+- 💻 **Servidor Local:** [http://localhost:8501](http://localhost:8501)
+
+---
+
+## 🎨 Identidad Visual y Paleta "Aqua Natura"
+
+Inspirada en los ecosistemas hídricos y oceánicos, **AQUAMARIS** incorpora una ambientación marina interactiva con micro-animaciones fluidas de oleaje, gotas en suspensión y efectos de inmersión en tarjetas de datos:
+
+| Tonalidad | Código HEX | Rol en la Interfaz |
+| :--- | :---: | :--- |
+| **Azul profundo** | `#123047` | Encabezados, barras de navegación y tarjetas de fondo oscuro. |
+| **Azul río** | `#087E8B` | Botones de acción, pestañas seleccionadas y controles activos. |
+| **Turquesa agua** | `#38B6C5` | Ondas marinas, gotas en suspensión, resaltados y micro-animaciones CSS. |
+| **Verde bosque** | `#25866C` | Indicadores de cumplimiento normativo RAS y alertas de verificación exitosa. |
+| **Verde natural** | `#83B88C` | Etiquetas ecológicas, detalles técnicos secundarios y acentos visuales. |
+| **Blanco niebla** | `#F4F9F8` | Fondo general de la aplicación y crestas de ondas. |
 
 ---
 
 ## 📋 Tabla de Contenidos
-- [Novedades de la Versión 3.0](#-novedades-de-la-versión-30)
+- [Características Principales](#-características-principales)
 - [Marco Normativo RAS 0330 / 2017 vs. Modo Exploratorio](#-marco-normativo-ras-0330--2017-vs-modo-exploratorio)
 - [Fundamentación Matemática y Ecuaciones Hidráulicas](#-fundamentación-matemática-y-ecuaciones-hidráulicas)
 - [Diferenciación Rigurosa entre Demanda Media y Caudales Máximos](#-diferenciación-rigurosa-entre-demanda-media-y-caudales-máximos)
@@ -19,25 +39,20 @@ Implementa el marco normativo colombiano **RAS (Resolución 0330 de 2017 del Min
 
 ---
 
-## 🌟 Novedades de la Versión 3.0
+## 🌟 Características Principales
 
-1. **Rediseño Completo de la Interfaz:**
-   - Paleta sobria de consultoría: Azul petróleo (`#123047`), Turquesa técnico (`#149D9A`), Fondo suave (`#F7F9FC`) y Blanco técnico (`#FFFFFF`).
-   - Organización en 4 pestañas especializadas:
-     1. *Demanda doméstica*
-     2. *Demanda industrial*
-     3. *Resultados y auditoría*
-     4. *Exportación de informes*
-2. **Cumplimiento Normativo RAS (Resolución 0330 de 2017):**
-   - Incorporación de pisos térmicos y cotas altimétricas (Art. 43) y límite del 25% en pérdidas técnicas (Art. 44).
-   - Distinción explícita de un *Modo Exploratorio* para modelaciones sin sujeción a la norma colombiana.
-3. **Reconstrucción Integral del Libro Excel (`openpyxl`):**
-   - 5 hojas técnicas formalizadas con fórmulas auditables en celdas, valores numéricos reales, filtros automáticos, paneles congelados, gráficos incrustados y verificación de concordancia `Python vs Excel`.
-4. **Eliminación de Formatos TXT y CSV en Pantalla:**
-   - Supresión de descargas planas en bloc de notas. Descarga principal en Excel y descarga complementaria en PDF formal.
-5. **Inventario Industrial Unificado:**
-   - Tabla interactiva editable (`st.data_editor`) vinculada directamente al motor de cálculo en tiempo real.
-   - Cálculo del **Caudal en Turno Operativo ($Q_{op}$)** para dimensionamiento de acometidas fabriles en jornadas restringidas (8h, 12h, 16h).
+1. **Ambientación Marina y Marca Propia:**
+   - Logotipo vectorial oficial SVG integrado, simulando un escudo oceánico con oleaje dinámico y gota cristalina.
+   - Animaciones fluidas en CSS (`@keyframes waveMove`, `@keyframes waveBack`, `@keyframes floatDroplet`) con estética marina inmersiva.
+2. **Organización en 4 Módulos Especializados:**
+   - 🏠 **Demanda Doméstica:** Selección por pisos térmicos / altitud o modo libre, cálculo de dotación bruta y pérdidas técnicas en red.
+   - 🏭 **Demanda Industrial:** Catálogo de industrias con consumos específicos respaldados en literatura técnica (UNESCO, CONAGUA, CEPIS), turnos operativos ($Q_{op}$) y editor unificado `st.data_editor`.
+   - 📊 **Resultados y Auditoría:** Gráfica comparativa de demandas, balance hídrico global y distribución de caudales para obras hidráulicas.
+   - 📥 **Exportación de Informes:** Generación de memoria técnica en Excel (`.xlsx`) y reporte ejecutivo en PDF (`.pdf`). Se eliminaron completamente formatos planos obsoletos (TXT y CSV).
+3. **Cumplimiento Normativo RAS (Resolución 0330 de 2017):**
+   - Validación automática de topes de dotación neta (Art. 43) y pérdidas técnicas máximas del 25% (Art. 44).
+4. **Excel con Fórmulas Vivas y Verificación:**
+   - 5 hojas estructuradas con fórmulas de celdas (`openpyxl`), gráficos de barras incrustados y módulo de verificación `Python vs Excel`.
 
 ---
 
@@ -90,13 +105,13 @@ $$Q_{md, dom} = \frac{P \times D_{bruta}}{86\,400} = \frac{V_{dom}}{86.40} \quad
 
 ## 📊 Reconstrucción Profesional del Libro Excel (5 Hojas)
 
-Generado dinámicamente mediante `openpyxl` sin plantillas estáticas:
+Generado dinámicamente mediante `openpyxl` aplicando la paleta visual **Aqua Natura**:
 
 1. **`01_Resumen`:** Cuadro de mando ejecutivo con caudales en $L/s$ y $m^3/\text{día}$, porcentajes de participación, destinos de diseño y gráfico de barras incrustado.
 2. **`02_Datos_Entrada`:** Parámetros de diseño (población, altitud, dotación neta, pérdidas, $k_1$, $k_2$).
 3. **`03_Memoria_Calculo`:** Trazabilidad paso a paso con **fórmulas nativas de Excel enlazadas a celdas** (`=B7/(1-B8)`, `=E5*1000/86400`, etc.).
 4. **`04_Detalle_Industrial`:** Desglose pormenorizado por industria, horas de operación, caudales de turno ($Q_{op}$), fuentes técnicas documentadas y totales con función `=SUM(...)`.
-5. **`05_Verificacion`:** Auditoría de concordancia entre los cálculos de Python y las fórmulas de Excel, verificando que la diferencia absoluta sea $0.000000$ (tolerancia $< 10^{-4}$).
+5. **`05_Verificacion`:** Auditoría de concordancia entre los cálculos de Python y las fórmulas de Excel, certificando concordancia exacta ($0.000000$, tolerancia $< 10^{-4}$).
 
 ---
 
@@ -104,13 +119,15 @@ Generado dinámicamente mediante `openpyxl` sin plantillas estáticas:
 
 ```
 HIDROLOGIA JEFERSON/
-├── app.py                  # Interfaz profesional en Streamlit v3.0
-├── hydrology_engine.py      # Motor de cálculo, auditoría y validación RAS 0330
-├── excel_generator.py       # Generador de memorias en Excel (5 hojas openpyxl)
-├── pdf_generator.py         # Generador de informes técnicos en PDF (reportlab)
-├── test_calculations.py    # Suite de pruebas unitarias automatizadas (pytest)
-├── requirements.txt        # Dependencias de Python requeridas
-└── README.md               # Documentación técnica completa
+├── assets/
+│   └── logo.svg             # Logotipo vectorial oficial AQUAMARIS en SVG
+├── app.py                   # Interfaz interactiva Streamlit con ambientación marina
+├── hydrology_engine.py       # Motor de cálculo, validaciones físicas y normativa RAS
+├── excel_generator.py        # Generador de memorias en Excel con fórmulas vivas
+├── pdf_generator.py          # Generador de memorias de cálculo en PDF formal
+├── test_calculations.py     # Suite de 14 pruebas unitarias (pytest)
+├── requirements.txt         # Dependencias del entorno Python
+└── README.md                # Documentación técnica completa
 ```
 
 ---
